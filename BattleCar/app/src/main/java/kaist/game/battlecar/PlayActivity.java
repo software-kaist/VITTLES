@@ -3,10 +3,12 @@ package kaist.game.battlecar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -20,6 +22,11 @@ import android.widget.Toast;
 
 import org.freedesktop.gstreamer.GStreamer;
 
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import kaist.game.battlecar.view.GStreamerSurfaceView;
 import kaist.game.battlecar.view.JoystickView;
@@ -56,6 +63,9 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private TextView powerTextView;
     private TextView directionTextView;
     private JoystickView joystick;
+
+    private String address, result;
+    BackgroundTask task;
 
     // Called when the activity is first created.
     @Override
@@ -116,19 +126,21 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                is_playing_desired = true;
+                task = new BackgroundTask();
+                task.execute();
+                /*is_playing_desired = true;
                 wake_lock.acquire();
                 setMediaUri ();
-                nativePlay();
+                nativePlay();*/
             }
         });
 
         ImageButton pause = (ImageButton) this.findViewById(R.id.button_stop);
         pause.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                is_playing_desired = false;
+                /*is_playing_desired = false;
                 wake_lock.release();
-                nativePause();
+                nativePause();*/
             }
         });
 
@@ -173,6 +185,60 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         this.findViewById(R.id.button_stop).setEnabled(false);
 
         nativeInit();
+    }
+
+    class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
+        protected void onPreExecute() {
+            //URL url = new URL("http://hochan97.iptime.org:8888/camonoff");
+            address = "http://hochan97.iptime.org:8888/camonoff";
+        }
+
+        @Override
+        protected Integer doInBackground(Integer... arg0) {
+            // TODO Auto-generated method stub
+            result = request(address);
+            return null;
+        }
+
+        protected void onPostExecute(Integer a) {
+            //tv.setText(result);
+        }
+
+    }
+
+    private String request(String urlStr) {
+        StringBuilder output = new StringBuilder();
+        try {
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            if (conn != null) {
+                conn.setConnectTimeout(10000);
+                //conn.setRequestMethod("GET");
+                //conn.setDoInput(true);
+                //conn.setDoOutput(true);
+
+                int resCode = conn.getResponseCode();
+                if (resCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream())) ;
+                    String line = null;
+                    while(true) {
+                        line = reader.readLine();
+                        if (line == null) {
+                            break;
+                        }
+                        output.append(line + "\n");
+                    }
+
+                    reader.close();
+                    conn.disconnect();
+                }
+            }
+        } catch(Exception ex) {
+            Log.e("SampleHTTP", "Exception in processing response.", ex);
+            ex.printStackTrace();
+        }
+
+        return output.toString();
     }
 
     private void setJoyStickView() {

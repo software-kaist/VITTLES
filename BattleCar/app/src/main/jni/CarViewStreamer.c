@@ -346,7 +346,7 @@ static void *app_function (void *userdata) {
   //data->pipeline = gst_parse_launch("playbin", &error);  fpsdisplaysink sync=false text-overlay=false !
   // udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! decodebin ! glimagesink name=video_sink
   // tcpclientsrc host=hochan97.iptime.org port=5001 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink sync=false ! decodebin ! glimagesink name=video_sink
-  data->pipeline = gst_parse_launch("tcpclientsrc host=hochan97.iptime.org port=5001 ! gdpdepay ! rtph264depay ! avdec_h264 ! decodebin ! glimagesink name=video_sink", &error);
+  data->pipeline = gst_parse_launch("udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! decodebin ! glimagesink name=video_sink", &error);
   if (error) {
     gchar *message = g_strdup_printf("Unable to build pipeline: %s", error->message);
     g_clear_error (&error);
