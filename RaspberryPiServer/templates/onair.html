@@ -20,11 +20,11 @@
 
   <div data-role="main" class="ui-content">
   <p>{{ message }}</p>
-      <a href="/input/1" data-role="button" data-inline="true">TV Power</a>
-      <a href="/input/2" data-role="button" data-inline="true">Ch +</a>
-      <a href="/input/3" data-role="button" data-inline="true">Ch -</a>
-      <a href="/input/4" data-role="button" data-inline="true">Vol +</a>
-      <a href="/input/5" data-role="button" data-inline="true">Vol -</a>
+      <a href="/inputTV/1" data-role="button" data-inline="true">TV Power</a>
+      <a href="/inputTV/2" data-role="button" data-inline="true">Ch +</a>
+      <a href="/inputTV/3" data-role="button" data-inline="true">Ch -</a>
+      <a href="/inputTV/4" data-role="button" data-inline="true">Vol +</a>
+      <a href="/inputTV/5" data-role="button" data-inline="true">Vol -</a>
   </div>
 <!--    
     <div class="flowplayer" data-rtmp="rtmp://hochan97.iptime.org/flvplayback">
@@ -52,21 +52,9 @@
     <div id="video-jwplayer_aspect" style="display: none;"></div>
     <div id="video-jwplayer_jwpsrv" style="position: absolute; top: 0px; z-index: 10;"></div>
 </div>
-
-<script type="text/javascript">
-    $(document).bind('mobileinit',function(){
-      $.mobile.pageLoadErrorMessage = 'Custom error message';
-    })
-</script>
     
 <script type="text/javascript" src="{{url_for('static', filename='js/jwplayer.js')}}"></script>
 <script type="text/javascript">
-    $(document).bind('mobileinit',function(){
-      $.mobile.pageLoadErrorMessage = 'Custom error message';
-    })
-    $(document).bind("mobileinit", function(){
-      $.mobile.pageLoadErrorMessage = "";
-    });
     $(window).on("resize", methodToFixLayout);
     var docWidth = $(document).width();
     $("#video-jwplayer_wrapper").width(docWidth);

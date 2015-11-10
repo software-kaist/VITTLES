@@ -64,8 +64,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private TextView directionTextView;
     private JoystickView joystick;
 
-    private String address, result;
-    BackgroundTask task;
 
     // Called when the activity is first created.
     @Override
@@ -118,7 +116,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         setContentView(R.layout.activity_play);
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wake_lock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "GStreamer tutorial 5");
+        wake_lock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "GStreamer battle car");
         wake_lock.setReferenceCounted(false);
 
         setJoyStickView();
@@ -126,12 +124,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                task = new BackgroundTask();
-                task.execute();
-                /*is_playing_desired = true;
-                wake_lock.acquire();
-                setMediaUri ();
-                nativePlay();*/
+                new BackgroundTask("http://hochan97.iptime.org:8888/camonoff").execute();
             }
         });
 
@@ -188,15 +181,18 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     }
 
     class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
+        private String mURL;
+
+        public BackgroundTask(String url){
+            mURL = url;
+        }
         protected void onPreExecute() {
-            //URL url = new URL("http://hochan97.iptime.org:8888/camonoff");
-            address = "http://hochan97.iptime.org:8888/camonoff";
         }
 
         @Override
         protected Integer doInBackground(Integer... arg0) {
             // TODO Auto-generated method stub
-            result = request(address);
+            request(mURL);
             return null;
         }
 
@@ -253,43 +249,73 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
             @Override
             public void onValueChanged(int angle, int power, int direction) {
-                // TODO Auto-generated method stub
+                final String delimiter = "$";
+                int movement = 0;
+                int steering = 0;
+                int weapon = 0;
+
                 angleTextView.setText(" " + String.valueOf(angle) + "°");
                 powerTextView.setText(" " + String.valueOf(power) + "%");
+
                 switch (direction) {
                     case JoystickView.FRONT:
+                        movement = 1;
                         directionTextView.setText("front");
                         break;
                     case JoystickView.FRONT_RIGHT:
+                        movement = 1;
                         directionTextView.setText("front_right");
                         break;
                     case JoystickView.RIGHT:
+                        movement = 0;
                         directionTextView.setText("right");
                         break;
                     case JoystickView.RIGHT_BOTTOM:
+                        movement = 2;
                         directionTextView.setText("right_bottom");
                         break;
                     case JoystickView.BOTTOM:
+                        movement = 2;
                         directionTextView.setText("bottom");
                         break;
                     case JoystickView.BOTTOM_LEFT:
+                        movement = 2;
                         directionTextView.setText("bottom_left");
                         break;
                     case JoystickView.LEFT:
+                        movement = 0;
                         directionTextView.setText("left");
                         break;
                     case JoystickView.LEFT_FRONT:
+                        movement = 1;
                         directionTextView.setText("left_front");
                         break;
                     default:
+                        movement = 0;
                         directionTextView.setText("center");
                 }
+                if (angle < 0 && angle > -179) {
+                    steering = 1;
+                } else if (angle > 0 && angle < 180) {
+                    steering = 2;
+                } else {
+                    steering = 0;
+                }
+                /*
+                neutral    0
+                movement forward|reverse (1|2)
+                steering left|right (1|2)
+                "movement,steering,angle(-180~180),power(0~100%),weapon"
+                */
+                StringBuilder commandCode = new StringBuilder();
+                commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
+                new BackgroundTask("http://hochan97.iptime.org:8888/inputBattleCar/" + commandCode.toString()).execute();
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
 
-    protected void onSaveInstanceState (Bundle outState) {
-        Log.d ("GStreamer", "Saving state, playing:" + is_playing_desired + " position:" + position +
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d("GStreamer", "Saving state, playing:" + is_playing_desired + " position:" + position +
                 " duration: " + duration + " uri: " + mediaUri);
         outState.putBoolean("playing", is_playing_desired);
         outState.putInt("position", position);
