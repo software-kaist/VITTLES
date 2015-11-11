@@ -3,12 +3,12 @@ package kaist.game.battlecar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.freedesktop.gstreamer.GStreamer;
-
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -121,10 +120,17 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
         setJoyStickView();
 
+        WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+        int ip = wm.getConnectionInfo().getIpAddress();
+        final String wifiIpAddress = String.format("%d.%d.%d.%d",
+                (ip & 0xff),
+                (ip >> 8 & 0xff),
+                (ip >> 16 & 0xff),
+                (ip >> 24 & 0xff));
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                new BackgroundTask("http://hochan97.iptime.org:8888/camonoff").execute();
+                new BackgroundTask("http://hochan97.iptime.org:8888/camonoff/" + wifiIpAddress).execute();
             }
         });
 

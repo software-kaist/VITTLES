@@ -78,16 +78,30 @@ def camera_off():
 def show_result():
 	return render_template('result.html')
 
-cmd1 = "raspivid -t 0 -h 200 -w 355 -fps 20 -hf -vf -b 2000000 -o - | gst-launch-1.0 -e -vvvv fdsrc ! h264parse ! rtph264pay pt=96 config-interval=1 ! udpsink host=192.168.0.6 port=5000"
+cmd1 = "raspivid -t 0 -h 200 -w 355 -fps 20 -hf -vf -b 2000000 -o - | gst-launch-1.0 -e -vvvv fdsrc ! h264parse ! rtph264pay pt=96 config-interval=1 ! udpsink host=%s port=5000"
 
-@app.route("/camonoff")
-def cam_onoff():
+@app.route('/camonoff/<client_ip>')
+def cam_onoff(client_ip):
     global subproc, flag
+    #fwd = request.environ.get('HTTP_X_FORWARDED_FOR', None)
+    #if fwd is None:
+    #    clientIP = request.remote_addr
+    #else:
+    #    ip_adds = request.headers.getlist("X-Forwarded-For")
+    #    clientIP = ip_adds[0]
+        
+    print("\n-------------------------------------------------------")
+    print("Client IP : " + client_ip)
+    #print("URL : " + request.url)
+    #print("Headers \n " + str(request.headers))
+    #print("Data : " + str(request.data))
+    print("-------------------------------------------------------\n")
+        
     if flag == 1:
         os.killpg(subproc.pid, signal.SIGKILL)
         flag = 0
     elif flag == 0:
-        proc = subprocess.Popen(cmd1, shell=True, preexec_fn=os.setsid)
+        proc = subprocess.Popen(cmd1%client_ip, shell=True, preexec_fn=os.setsid)
         subproc = proc
         flag = 1
     return "test"
@@ -109,11 +123,10 @@ def sendIRSignalQRemote(input_id):
 #neutral    0
 #movement forward|reverse (1|2)
 #steering left|right (1|2)
-#"movement,steering,angle(-180~180),power(0~100%),weapon"
+#movement $ steering $ angle(-180~180) $ power(0~100%) $ weapon
 @app.route('/inputBattleCar/<command>')
 def inputBattleCar(command):
     data = command.split('$')
-    print(len(command))
     movement = int(data[0])
     steering = int(data[1])
     angle = int(data[2])
