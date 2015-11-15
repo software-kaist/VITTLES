@@ -335,6 +335,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         if (wake_lock.isHeld())
             wake_lock.release();
         super.onDestroy();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     // Called from native code. This sets the content of the TextView from the UI thread.

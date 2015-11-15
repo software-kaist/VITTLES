@@ -295,7 +295,7 @@ static void state_changed_cb (GstBus *bus, GstMessage *msg, CustomData *data) {
     /* The Ready to Paused state change is particularly interesting: */
     if (old_state == GST_STATE_READY && new_state == GST_STATE_PAUSED) {
       /* By now the sink already knows the media size */
-      check_media_size(data);
+      //check_media_size(data);
 
       /* If there was a scheduled seek, perform it now that we have moved to the Paused state */
       if (GST_CLOCK_TIME_IS_VALID (data->desired_position))
@@ -309,14 +309,15 @@ static void state_changed_cb (GstBus *bus, GstMessage *msg, CustomData *data) {
 static void check_initialization_complete (CustomData *data) {
   JNIEnv *env = get_jni_env ();
   if (!data->initialized && data->native_window && data->main_loop) {
+    // hochan
     GstElement *video_sink;
     GST_DEBUG ("Initialization complete, notifying application. native_window:%p main_loop:%p", data->native_window, data->main_loop);
 
-    video_sink = gst_bin_get_by_name (data->pipeline, "video_sink");
+    video_sink = gst_bin_get_by_name (GST_BIN(data->pipeline), "video_sink");
     /* The main loop is running and we received a native window, inform the sink about it */
     gst_video_overlay_set_window_handle (GST_VIDEO_OVERLAY (video_sink), (guintptr)data->native_window);
     gst_object_unref (video_sink);
-
+    // hochan
     (*env)->CallVoidMethod (env, data->app, on_gstreamer_initialized_method_id);
     if ((*env)->ExceptionCheck (env)) {
       GST_ERROR ("Failed to call Java method");
@@ -527,13 +528,22 @@ static void gst_native_surface_init (JNIEnv *env, jobject thiz, jobject surface)
 }
 
 static void gst_native_surface_finalize (JNIEnv *env, jobject thiz) {
+  GstElement *video_sink = NULL;
   CustomData *data = GET_CUSTOM_DATA (env, thiz, custom_data_field_id);
   if (!data) return;
   GST_DEBUG ("Releasing Native Window %p", data->native_window);
 
-  if (data->pipeline) {
-    gst_video_overlay_set_window_handle (GST_VIDEO_OVERLAY (data->pipeline), (guintptr)NULL);
+
+  GST_DEBUG ("Initialization complete, notifying application. native_window:%p main_loop:%p", data->native_window, data->main_loop);
+  __android_log_print (ANDROID_LOG_ERROR, "CarViewStreamer", "Initialization complete, notifying application. native_window:%p main_loop:%p", data->native_window, data->main_loop);
+
+  video_sink = gst_bin_get_by_name (GST_BIN(data->pipeline), "video_sink");
+  if (video_sink!=NULL) {
+    //gst_video_overlay_set_window_handle (GST_VIDEO_OVERLAY (data->pipeline), (guintptr)NULL);
+    gst_video_overlay_set_window_handle (GST_VIDEO_OVERLAY (video_sink), (guintptr)NULL);
     gst_element_set_state (data->pipeline, GST_STATE_READY);
+    gst_object_unref (video_sink);
+    __android_log_print (ANDROID_LOG_ERROR, "CarViewStreamer", "gst_object_unref (video_sink)");
   }
 
   ANativeWindow_release (data->native_window);
