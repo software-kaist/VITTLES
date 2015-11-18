@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@mipmap/vittles_bg"
+    tools:context="kaist.game.battlecar.MainActivity">
+
+    <!-- android:background="@android:color/transparent" -->
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Bettle Car"
+        android:id="@+id/ChangeCarBtn"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="76dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="onChangeCarBtnClicked"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play Game"
+        android:id="@+id/PlayGameBtn"
+        android:layout_below="@+id/ChangeCarBtn"
+        android:layout_alignEnd="@+id/ChangeCarBtn"
+        android:nestedScrollingEnabled="true"
+        android:onClick="onPlayGameBtnClicked" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Item Store"
+        android:id="@+id/ItemStoreBtn"
+        android:layout_below="@+id/PlayGameBtn"
+        android:layout_alignEnd="@+id/PlayGameBtn"
+        android:onClick="onItemStoreBtnClicked" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:id="@+id/SettingBtn"
+        android:layout_below="@+id/ItemStoreBtn"
+        android:layout_alignEnd="@+id/PlayGameBtn"
+        android:onClick="onSettingBtnClicked"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Exit"
+        android:id="@+id/ExitBtn"
+        android:layout_below="@+id/SettingBtn"
+        android:layout_alignEnd="@+id/SettingBtn"
+        android:onClick="onExitBtnClicked"/>
+</RelativeLayout>
