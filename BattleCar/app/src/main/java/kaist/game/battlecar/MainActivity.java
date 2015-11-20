@@ -17,7 +17,8 @@ public class MainActivity extends Activity {
     }
 
     public void onChangeCarBtnClicked(View v) {
-        Toast.makeText(getApplicationContext(), "onChangeCarBtnClicked", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(getApplicationContext(), CarChangeActivity.class);
+        startActivity(intent);
     }
 
     public void onPlayGameBtnClicked(View v) {
