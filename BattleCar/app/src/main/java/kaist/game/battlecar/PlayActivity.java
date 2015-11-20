@@ -130,7 +130,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                new BackgroundTask("http://hochan97.iptime.org:8888/camonoff/" + wifiIpAddress).execute();
+                new BackgroundTask("http://jwlee.iptime.org:8888/camonoff/" + wifiIpAddress).execute();
             }
         });
 
@@ -300,9 +300,9 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                         movement = 0;
                         directionTextView.setText("center");
                 }
-                if (angle < 0 && angle > -179) {
+                if (angle < -23 && angle > -157) {
                     steering = 1;
-                } else if (angle > 0 && angle < 180) {
+                } else if (angle > 23 && angle < 157) {
                     steering = 2;
                 } else {
                     steering = 0;
@@ -315,7 +315,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 */
                 StringBuilder commandCode = new StringBuilder();
                 commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
-                new BackgroundTask("http://hochan97.iptime.org:8888/inputBattleCar/" + commandCode.toString()).execute();
+                new BackgroundTask("http://jwlee.iptime.org:8888/inputBattleCar/" + commandCode.toString()).execute();
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
