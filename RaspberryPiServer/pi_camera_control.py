@@ -29,7 +29,7 @@ IC1_B = 22
  
 #Motor 2 GPIO Pin
 IC2_A = 17
-IC2_B = 23
+IC2_B = 18
  
 gpio.setmode(gpio.BCM)
  
@@ -39,6 +39,9 @@ gpio.setup(IC1_A, gpio.OUT)
 gpio.setup(IC1_B, gpio.OUT)
 gpio.setup(IC2_A, gpio.OUT)
 gpio.setup(IC2_B, gpio.OUT)
+
+pwm = gpio.PWM(IC2_B,1000)
+pwm.ChangeDutyCycle(80)
 
 #cmd = "raspivid -n -t 0 -h 200 -w 320 -fps 20 -hf -vf -b 2000000 -o - | gst-launch-1.0 -v fdsrc ! h264parse ! rtph264pay pt=96 config-interval=1 ! gdppay ! tcpserversink host=192.168.0.12 port=5000"
 #youtube live streaming
@@ -170,8 +173,8 @@ def inputBattleCar(command):
 def forward():
     #LOG('info','GPIO Forward')
     gpio.output(IC2_A, gpio.LOW)
-    gpio.output(IC2_B, gpio.HIGH)
-
+    #gpio.output(IC2_B, gpio.HIGH)
+    pwm.start(80)
 def backward():
     #LOG('info','GPIO Backward')
     gpio.output(IC2_A, gpio.HIGH)
@@ -189,6 +192,7 @@ def turnRight():
 
 def stopFB():
     #LOG('info','GPIO Stop Back Wheel')
+    pwm.stop()
     gpio.output(IC2_A, gpio.LOW)
     gpio.output(IC2_B, gpio.LOW)
 
