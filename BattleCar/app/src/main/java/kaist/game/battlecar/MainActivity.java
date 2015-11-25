@@ -22,8 +22,17 @@ public class MainActivity extends Activity {
     }
 
     public void onPlayGameBtnClicked(View v) {
-        Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
-        startActivity(intent);
+        //Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+        //startActivity(intent);
+
+        findViewById(R.id.ChangeCarBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.PlayGameBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.ItemStoreBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.SettingBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.ExitBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.BattleModeBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.RacingModeBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.Back1Btn).setVisibility(View.VISIBLE);
     }
 
     public void onItemStoreBtnClicked(View v) {
@@ -39,5 +48,49 @@ public class MainActivity extends Activity {
     public void onExitBtnClicked(View v) {
         Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.naver.com"));
         startActivity(myIntent);
+    }
+
+    public void onBattleModeBtnClicked(View v) {
+
+        findViewById(R.id.BattleModeBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.RacingModeBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.Back1Btn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.Back2Btn).setVisibility(View.VISIBLE);
+        findViewById(R.id.CreateBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.JoinBtn).setVisibility(View.VISIBLE);
+    }
+
+    public void onRacingModeBtnClicked(View v) {
+        Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+        startActivity(intent);
+    }
+
+    public void onCreateBtnClicked(View v) {
+        Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+        startActivity(intent);
+    }
+
+    public void onJoinBtnClicked(View v) {
+        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.naver.com"));
+        startActivity(myIntent);
+    }
+
+    public void onBack1BtnClicked(View v) {
+        findViewById(R.id.ChangeCarBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.PlayGameBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.ItemStoreBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.SettingBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.ExitBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.BattleModeBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.RacingModeBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.Back1Btn).setVisibility(View.INVISIBLE);
+    }
+    public void onBack2BtnClicked(View v) {
+        findViewById(R.id.BattleModeBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.RacingModeBtn).setVisibility(View.VISIBLE);
+        findViewById(R.id.Back1Btn).setVisibility(View.VISIBLE);
+        findViewById(R.id.CreateBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.JoinBtn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.Back2Btn).setVisibility(View.INVISIBLE);
     }
 }

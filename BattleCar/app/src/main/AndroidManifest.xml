@@ -62,6 +62,13 @@
             android:label="VITTLES"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name=".CreateActivity"
+            android:label="VITTLES"
+            android:launchMode="singleInstance"
+            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
         </activity>
     </application>

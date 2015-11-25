@@ -304,7 +304,13 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                     steering = 1;
                 } else if (angle > 23 && angle < 157) {
                     steering = 2;
-                } else {
+                } else{
+                    steering =0;
+                }
+                if (angle > -113 && angle < -67)
+                {
+                    steering = 0;
+                }  else if (angle > 67  && angle < 113){
                     steering = 0;
                 }
                 /*

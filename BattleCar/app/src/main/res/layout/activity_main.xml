@@ -57,4 +57,68 @@
         android:layout_below="@+id/SettingBtn"
         android:layout_alignEnd="@+id/SettingBtn"
         android:onClick="onExitBtnClicked"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BattleMode"
+        android:id="@+id/BattleModeBtn"
+        android:visibility="gone"
+        android:layout_below="@+id/ChangeCarBtn"
+        android:layout_alignEnd="@+id/SettingBtn"
+        android:onClick="onBattleModeBtnClicked"/>
+
+    <Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="RacingMode"
+    android:id="@+id/RacingModeBtn"
+    android:visibility="gone"
+    android:layout_below="@+id/BattleModeBtn"
+    android:layout_alignEnd="@+id/SettingBtn"
+    android:onClick="onRacingModeBtnClicked"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create"
+        android:id="@+id/CreateBtn"
+        android:visibility="gone"
+        android:layout_below="@+id/ChangeCarBtn"
+        android:layout_alignEnd="@+id/SettingBtn"
+        android:onClick="onCreateBtnClicked"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Join"
+        android:id="@+id/JoinBtn"
+        android:visibility="gone"
+        android:layout_below="@+id/CreateBtn"
+        android:layout_alignEnd="@+id/SettingBtn"
+        android:onClick="onJoinBtnClicked"/>
+
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@mipmap/back"
+        android:id="@+id/Back1Btn"
+        android:visibility="gone"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="onBack1BtnClicked"/>
+
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@mipmap/back"
+        android:id="@+id/Back2Btn"
+        android:visibility="gone"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="onBack2BtnClicked"/>
 </RelativeLayout>
