@@ -3,12 +3,14 @@ package kaist.game.battlecar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -62,7 +64,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private TextView powerTextView;
     private TextView directionTextView;
     private JoystickView joystick;
-
+    private SharedPreferences setting;
 
     // Called when the activity is first created.
     @Override
@@ -130,7 +132,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                new BackgroundTask(R.string.pref_default_vittles_url + "/camonoff/" + wifiIpAddress).execute();
+                String vittlesUrl = setting.getString("vittles_url", "");
+                new BackgroundTask(vittlesUrl + "/camonoff/" + wifiIpAddress).execute();
             }
         });
 
@@ -176,7 +179,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             Log.i ("GStreamer", "Activity created with no saved state:");
         }
         is_local_media = false;
-        Log.i ("GStreamer", "  playing:" + is_playing_desired + " position:" + position +
+        Log.i("GStreamer", "  playing:" + is_playing_desired + " position:" + position +
                 " duration: " + duration + " uri: " + mediaUri);
 
         // Start with disabled buttons, until native code is initialized
@@ -184,6 +187,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         this.findViewById(R.id.button_stop).setEnabled(false);
 
         nativeInit();
+
+        setting =  PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
@@ -319,9 +324,13 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 steering left|right (1|2)
                 "movement,steering,angle(-180~180),power(0~100%),weapon"
                 */
+
+                String vittlesUrl = setting.getString("vittles_url", "");
+                directionTextView.setText("VITTLES URL: " + vittlesUrl);
+
                 StringBuilder commandCode = new StringBuilder();
                 commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
-                new BackgroundTask(R.string.pref_default_vittles_url + "/inputBattleCar/" + commandCode.toString()).execute();
+                new BackgroundTask(vittlesUrl + "/inputBattleCar/" + commandCode.toString()).execute();
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
