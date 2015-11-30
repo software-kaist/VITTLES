@@ -41,8 +41,8 @@ public class MainActivity extends Activity {
     }
 
     public void onSettingBtnClicked(View v) {
-        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.github.com"));
-        startActivity(myIntent);
+        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(intent);
     }
 
     public void onExitBtnClicked(View v) {

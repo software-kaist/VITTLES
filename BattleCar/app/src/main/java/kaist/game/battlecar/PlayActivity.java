@@ -130,7 +130,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                new BackgroundTask("http://jwlee.iptime.org:8888/camonoff/" + wifiIpAddress).execute();
+                new BackgroundTask(R.string.pref_default_vittles_url + "/camonoff/" + wifiIpAddress).execute();
             }
         });
 
@@ -321,7 +321,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 */
                 StringBuilder commandCode = new StringBuilder();
                 commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
-                new BackgroundTask("http://jwlee.iptime.org:8888/inputBattleCar/" + commandCode.toString()).execute();
+                new BackgroundTask(R.string.pref_default_vittles_url + "/inputBattleCar/" + commandCode.toString()).execute();
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
