@@ -1,7 +1,10 @@
 LOCAL_PATH := $(call my-dir)
 
 # Edit this line
+# Linux & MAC OSX
 GSTREAMER_ROOT_ANDROID := /Users/songhochan/Android/library/gstreamer-1.0-android-arm-release-1.4.4
+# Windows
+#GSTREAMER_ROOT_ANDROID := D:\Android\AndroidStudioProjects\gstreamer-1.0-android-arm-release-1.4.4
 
 SHELL := PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/local/bin/ /bin/bash
 
