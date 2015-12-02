@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@mipmap/vittles_bg"
+    tools:context="kaist.game.battlecar.WaitingRoomActivity">
+
+    <!-- android:background="@android:color/transparent" -->
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="400dp"
+        android:id="@+id/imageView"
+        android:src="#38f1dc"
+
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
+
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@mipmap/car_1"
+        android:id="@+id/Car1Btn"
+        android:layout_alignTop="@+id/imageView"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="25dp"/>
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/Car2Btn"
+        android:background="@mipmap/car_2"
+        android:layout_below="@+id/Car1Btn"
+        android:layout_alignEnd="@+id/Car1Btn"
+        android:nestedScrollingEnabled="true"
+        android:layout_marginLeft="25dp"/>
+
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/XBtn"
+        android:background="@mipmap/x"
+        android:nestedScrollingEnabled="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+</RelativeLayout>
