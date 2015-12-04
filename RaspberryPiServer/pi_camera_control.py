@@ -14,6 +14,8 @@ import time
 import RPi.GPIO as gpio
 import thread
 import threading
+import lirc
+import pygame
 
 app = Flask(__name__, static_url_path='/static')
 subproc = 0
@@ -22,6 +24,7 @@ onair_flag = 0
 capture_flag = 0
 mCamera = 0
 mPlayer = 0
+globalThread = 0
 
 #Motor 1 GPIO Pin
 IC1_A = 27
@@ -42,6 +45,9 @@ gpio.setup(IC2_B, gpio.OUT)
 
 pwm = gpio.PWM(IC2_B,1000)
 pwm.ChangeDutyCycle(80)
+
+#IR Init & Sound Init
+sockid = lirc.init("myprogram", blocking=False)
 
 #cmd = "raspivid -n -t 0 -h 200 -w 320 -fps 20 -hf -vf -b 2000000 -o - | gst-launch-1.0 -v fdsrc ! h264parse ! rtph264pay pt=96 config-interval=1 ! gdppay ! tcpserversink host=192.168.0.12 port=5000"
 #youtube live streaming
@@ -142,6 +148,40 @@ def sendIRSignalQRemote(input_id):
     s.close()
     pass
 
+class irThread (threading.Thread):
+    def __init__(self, threadID, name, energy):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.energy= energy
+        self.signal = True
+
+    def run(self):
+        print "Starting" + self.name
+        while self.energy and self.signal:
+            hit = lirc.nextcode()
+            if not hit :
+                print ("not hit")
+            else :
+                self.energy = self.energy - 10
+                print ("hit: %s , energy: %d" % (hit , self.energy))
+            time.sleep(0.2)
+        print "Exiting" + self.name
+
+@app.route("/irThreadEnable", methods=['GET', 'POST'])
+def irThreadEnable() :
+    global globalThread
+    print "enabled"
+    globalThread= irThread(1, "irThread", 100)
+    globalThread.start()
+
+@app.route("/irThreadDisable", methods=['GET', 'POST'])
+def irThreadDisable() :
+    global globalThread
+    if globalThread :
+        globalThread.signal = False
+        print "disabled"
+
 #neutral    0
 #movement forward|reverse (1|2)
 #steering left|right (1|2)
@@ -153,7 +193,7 @@ def inputBattleCar(command):
     steering = int(data[1])
     angle = int(data[2])
     power = int(data[3])
-    weapon = int(data[4])
+    weapon = data[4]
 
     if movement == 1:
         forward()
@@ -168,6 +208,10 @@ def inputBattleCar(command):
         turnRight()
     else:
         stopLR()
+#    print ("%s ----" % weapon)
+    if weapon :
+        irSend(weapon)
+
     return command
 
 def forward():
@@ -200,6 +244,16 @@ def stopLR():
     #LOG('info','GPIO Front Wheel Zero')
     gpio.output(IC1_A, gpio.LOW)
     gpio.output(IC1_B, gpio.LOW)
+
+# check commands in /etc/lirc/lirc.conf ...KEY_1,KEY2 ...
+def irSend(command):
+    print ("irsend "+ command)
+    pygame.mixer.init()
+    pygame.mixer.music.load("shoot.wav")
+    pygame.mixer.music.play()
+    os.system("irsend SEND_ONCE LG "+command)
+    while pygame.mixer.music.get_busy() == True:
+        continue
 
 def networkRecording(a):
     # Connect a client socket to my_server:8000 (change my_server to the
