@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:drawable="@drawable/ir_control_btn_text_focus_ani_01"
+        android:duration="150"/>
+    <item
+        android:drawable="@drawable/ir_control_btn_text_focus_ani_02"
+        android:duration="150"/>
+    <item
+        android:drawable="@drawable/ir_control_btn_text_focus_ani_03"
+        android:duration="150"/>
+    <item
+        android:drawable="@drawable/ir_control_btn_text_focus_ani_02"
+        android:duration="150"/>
+    <item
+        android:drawable="@drawable/ir_control_btn_text_focus_ani_01"
+        android:duration="150"/>
+</animation-list>

@@ -1,0 +1,43 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/grey"
+    tools:context=".LearnTestDialog" >
+
+    <Button
+        android:id="@+id/start_learn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:layout_alignParentRight="true"
+        android:text="Learn" />
+    
+    <TextView
+        android:id="@+id/func_name_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Function name" />
+
+    <EditText
+        android:id="@+id/func_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/func_name_title"
+        android:layout_toStartOf="@id/start_learn"
+        android:ems="10" >
+        <requestFocus />
+    </EditText>
+    
+    <ListView
+        android:id="@+id/func_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/func_name_input" />
+    
+</RelativeLayout>

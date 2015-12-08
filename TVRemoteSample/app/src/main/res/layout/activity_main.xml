@@ -1,0 +1,181 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/grey"
+    tools:context=".QRemoteSDK_Sample" >
+    
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="128dp"
+        android:layout_marginTop="138dp"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonDevices"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/buttonClear"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="14dp"
+        android:text="Devices" />
+
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" />
+
+    <Spinner
+        android:id="@+id/spinner2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/spinner1" />
+
+    <ImageButton
+     	android:id="@+id/power_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ir_control_btn_power_selector"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/buttonDevices" />
+     
+    <RelativeLayout
+        android:id="@+id/vol_btn_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/power_btn" >
+
+        <ImageButton
+            android:id="@+id/vol_btn_plus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ir_control_btn_vol_plus_selector" />
+
+        <ImageButton
+            android:id="@+id/vol_btn_minus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/vol_btn_plus"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ir_control_btn_vol_minus_selector" />
+
+        <TextView
+            android:id="@+id/vol_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="2"
+            android:text="Vol" />
+    </RelativeLayout>
+    
+    <Button
+        android:id="@+id/raw_ir_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/power_btn"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/vol_btn_layout"
+        android:background="@drawable/ir_control_btn_text_selector"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="2"
+        android:text="Raw IR" />
+    
+    <Button
+        android:id="@+id/learned_ir_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/power_btn"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/raw_ir_btn"
+        android:background="@drawable/ir_control_btn_text_selector"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="2"
+        android:text="Learned IR" />
+    
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/vol_btn_layout"
+        android:layout_below="@+id/buttonClear"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:layout_toLeftOf="@id/vol_btn_layout"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbarFadeDuration="0" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="500" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/buttonClear"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/linearLayout1"
+        android:layout_toLeftOf="@+id/buttonDevices"
+        android:text="Clear" />
+
+    <Button
+        android:id="@+id/buttonTest"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/scrollView1"
+        android:layout_toLeftOf="@+id/buttonClear"
+        android:text="Test" />
+
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/raw_ir_btn"
+        android:layout_toLeftOf="@id/raw_ir_btn">
+	   
+        <Button
+	        android:id="@+id/buttonLearnSelectedDev"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:textSize="13sp"
+	        android:gravity="center"
+	        android:lines="2"
+	        android:text="learn selected device" />
+	
+	    <Button
+	        android:id="@+id/buttonCreateDev"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+			android:textSize="13sp"
+	        android:gravity="center"
+	        android:lines="2"
+	        android:text="create device" />
+    
+    </LinearLayout>    
+
+</RelativeLayout>
