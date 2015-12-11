@@ -98,8 +98,9 @@ public class MainActivity extends Activity {
     }
 
     public void onExitBtnClicked(View v) {
-        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.naver.com"));
-        startActivity(myIntent);
+        moveTaskToBack(true);
+        finish();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     public void onBattleModeBtnClicked(View v) {
