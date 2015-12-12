@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import kaist.game.battlecar.util.WifiConnector;
 import kaist.game.battlecar.view.GStreamerSurfaceView;
 import kaist.game.battlecar.view.JoystickView;
 
@@ -189,6 +190,11 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         nativeInit();
 
         setting =  PreferenceManager.getDefaultSharedPreferences(this);
+
+        WifiConnector wifi = new WifiConnector(this, setting.getString("vittles_ap_prefix", ""));
+//        wifi.init();
+        // todo: Perference에 암호 방식과 암호도 저장해야 함!!
+        wifi.Connecting(setting.getString("my_vittles_ap", ""), "WPA", "intintint");
     }
 
     class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
