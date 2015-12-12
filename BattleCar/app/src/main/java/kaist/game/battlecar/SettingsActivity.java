@@ -178,6 +178,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("game_speed"));
             bindPreferenceSummaryToValue(findPreference("resolution"));
+            bindPreferenceSummaryToValue(findPreference("vittles_ap_prefix"));
         }
 
         @Override

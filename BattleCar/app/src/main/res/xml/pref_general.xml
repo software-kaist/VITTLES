@@ -33,4 +33,14 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_resolution" />
 
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="@string/pref_default_vittles_ap_prefix"
+        android:inputType="textCapWords"
+        android:key="vittles_ap_prefix"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_vittles_ap_prefix" />
+
 </PreferenceScreen>

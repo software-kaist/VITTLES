@@ -11,4 +11,14 @@
         android:singleLine="true"
         android:title="@string/pref_title_vittles_url" />
 
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="@string/pref_default_my_vittles_ap"
+        android:inputType="textCapWords"
+        android:key="my_vittles_ap"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_my_vittles_ap" />
+
 </PreferenceScreen>
