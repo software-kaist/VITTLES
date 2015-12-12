@@ -3,7 +3,7 @@
     package="kaist.game.battlecar">
 
     <uses-sdk
-        android:minSdkVersion="19"
+        android:minSdkVersion="16"
         android:targetSdkVersion="22" />
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -76,6 +76,11 @@
             android:label="@string/title_activity_waiting_room"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity android:name=".DeviceListActivity"
+            android:label="@string/select_device"
+            android:theme="@android:style/Theme.Dialog"
+            android:screenOrientation="landscape">
         </activity>
     </application>
 

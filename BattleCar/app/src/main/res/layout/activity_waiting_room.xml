@@ -35,7 +35,6 @@
         android:id="@+id/Car2Btn"
         android:background="@mipmap/car_2"
         android:layout_below="@+id/Car1Btn"
-        android:layout_alignEnd="@+id/Car1Btn"
         android:nestedScrollingEnabled="true"
         android:layout_marginLeft="25dp"/>
 
@@ -47,6 +46,23 @@
         android:nestedScrollingEnabled="true"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true" />
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@mipmap/back"
+        android:id="@+id/button_back"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentRight="true"
+        android:onClick="onBack1BtnClicked"/>
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:id="@+id/button_start"
+        android:background="@drawable/start_play"
+        android:visibility="gone"/>
 </RelativeLayout>
