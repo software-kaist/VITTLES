@@ -21,6 +21,7 @@ public class VittlesEffector {
     private SoundPool soundPool;
     private HashMap<Integer, Integer> soundPoolMap;
     private AudioManager  audioManager;
+    private HashMap<Integer, Integer> actionPoolMap;
 
 //    private boolean shotVibration;
 //    private boolean shotSound;
@@ -34,6 +35,12 @@ public class VittlesEffector {
         soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
         soundPoolMap = new HashMap<Integer, Integer>();
         audioManager = (AudioManager)ctx.getSystemService(Context.AUDIO_SERVICE);
+    }
+
+    public void setOption(boolean vib, boolean sound, boolean act) {
+        this.vibrationOn = vib;
+        this.soundOn = sound;
+        this.actionOn = act;
     }
 
     public void playVibration(int msec) {

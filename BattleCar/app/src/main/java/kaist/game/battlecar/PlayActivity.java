@@ -144,6 +144,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                vtEffector.playEffect(2, 200); // todo : TEST 삭제 요망!!
                 // todo : Vittels 접속 루틴 여기로 옮겨서 처리!!
                 String vittlesUrl = setting.getString("vittles_url", "");
                 new BackgroundTask(vittlesUrl + "/camonoff/" + wifiIpAddress).execute();
@@ -246,6 +247,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
         // Init Vittles Effector
         vtEffector = new VittlesEffector(getBaseContext());
+        vtEffector.setOption( setting.getBoolean("vibration_switch", true), setting.getBoolean("sound_effect_switch", true), true);
         vtEffector.addSound(1, R.raw.explosion6);
         vtEffector.addSound(2, R.raw.gunshot);
     }
