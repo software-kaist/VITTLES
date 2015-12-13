@@ -88,8 +88,8 @@ public class MainActivity extends Activity {
     }
 
     public void onItemStoreBtnClicked(View v) {
-        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.daum.net"));
-        startActivity(myIntent);
+        Intent intent = new Intent(getApplicationContext(), StoreActivity.class);
+        startActivity(intent);
     }
 
     public void onSettingBtnClicked(View v) {
@@ -115,6 +115,7 @@ public class MainActivity extends Activity {
 
     public void onRacingModeBtnClicked(View v) {
         Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+        intent.putExtra("ShootBtn",false);
         startActivity(intent);
     }
 
@@ -146,7 +147,7 @@ public class MainActivity extends Activity {
     }
 
     private void BTSetup(boolean isOwner) {
-        mIsOwner = isOwner;
+		mIsOwner = isOwner;
         if(btService == null) {
             btService = BluetoothService.getInstance(this);
             btService.setHandler(mHandler);

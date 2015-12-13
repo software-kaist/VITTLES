@@ -77,6 +77,11 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
         </activity>
+		<activity
+            android:name=".StoreActivity"
+            android:label="StoreActivity"
+            android:screenOrientation="landscape">
+        </activity>
         <activity android:name=".DeviceListActivity"
             android:label="@string/select_device"
             android:theme="@android:style/Theme.Dialog"

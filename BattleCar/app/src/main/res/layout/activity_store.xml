@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@mipmap/vittles_bg"
+    tools:context="kaist.game.battlecar.StoreActivity">
+
+    <!-- android:background="@android:color/transparent" -->
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="50dip"
+       android:background="@mipmap/sky"
+       android:layout_alignParentTop="true"
+       android:orientation="horizontal"
+
+       android:id="@+id/linearLayout">
+
+       <ImageButton
+           android:layout_width="100dip"
+           android:layout_height="50dip"
+           android:src="@mipmap/gunbtn"/>
+       <ImageButton
+           android:layout_width="100dip"
+           android:layout_height="50dip"
+           android:src="@mipmap/bulletbtn"/>
+       <ImageButton
+           android:layout_width="100dip"
+           android:layout_height="50dip"
+           android:src="@mipmap/vcoinbtn"/>
+       <TextView
+           android:layout_width="200dip"
+           android:layout_height="50dip"
+           android:background="@color/dim_foreground_disabled_material_light"
+           android:text="V-coin : 1500" />
+       <Button
+           android:layout_width="50dp"
+           android:layout_height="50dp"
+           android:background="@mipmap/back"
+           android:id="@+id/Back1Btn"
+           android:onClick="onBack1BtnClicked"/>
+   </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/linearLayout"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:background="@mipmap/sky"
+        android:id="@+id/linearLayout2">
+        <LinearLayout
+            android:layout_width="180dip"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="150dip"
+                android:layout_height="150dip"
+                android:layout_marginBottom="15dip"
+                android:src="@mipmap/gun1"
+                android:scaleType="fitXY"/>
+            <ImageButton
+                android:layout_width="150dip"
+                android:layout_height="50dip"
+                android:src="@mipmap/buy"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="180dip"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="150dip"
+                android:layout_height="150dip"
+                android:layout_marginBottom="15dip"
+                android:src="@mipmap/gun2"
+                android:scaleType="fitXY"/>
+            <ImageButton
+                android:layout_width="150dip"
+                android:layout_height="50dip"
+                android:src="@mipmap/buy"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="180dip"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="150dip"
+                android:layout_height="150dip"
+                android:layout_marginBottom="15dip"
+                android:src="@mipmap/gun3"
+                android:scaleType="fitXY"/>
+            <ImageButton
+                android:layout_width="150dip"
+                android:layout_height="50dip"
+                android:src="@mipmap/buy"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

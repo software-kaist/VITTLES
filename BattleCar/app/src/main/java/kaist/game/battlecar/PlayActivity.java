@@ -4,11 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -18,7 +22,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +32,7 @@ import org.freedesktop.gstreamer.GStreamer;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -67,12 +74,22 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private JoystickView joystick;
     private SharedPreferences setting;
 
+    //jw
+    TextView tv;
+    int hp=100;
+    boolean serverconnected=true;
+
+    //private Button shootButton;
+
     // Called when the activity is first created.
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
+
+
+        setting =  PreferenceManager.getDefaultSharedPreferences(this);
         // Initialize GStreamer and warn if it fails
         try {
             GStreamer.init(this);
@@ -147,6 +164,47 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             }
         });
 
+        //jw
+        tv= (TextView)findViewById(R.id.tv);
+        Button shoot = (Button) this.findViewById(R.id.button_Shoot);
+        if(getIntent().getBooleanExtra("ShootBtn",false)){
+            this.findViewById(R.id.hp1).setVisibility(View.VISIBLE);
+            this.findViewById(R.id.hp2).setVisibility(View.VISIBLE);
+            this.findViewById(R.id.hp3).setVisibility(View.VISIBLE);
+            this.findViewById(R.id.hp4).setVisibility(View.VISIBLE);
+            this.findViewById(R.id.hp5).setVisibility(View.VISIBLE);
+            this.findViewById(R.id.tv).setVisibility(View.VISIBLE);
+            shoot.setVisibility(View.VISIBLE);
+            String vittlesUrl = setting.getString("vittles_url", "");
+            new BackgroundTask(vittlesUrl + "/irThreadEnable").execute();
+            Log.i("Battle", "Start");
+            Log.i("ShootBtn", "Visible:");
+        }
+        else
+        {
+            this.findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
+            this.findViewById(R.id.hp2).setVisibility(View.INVISIBLE);
+            this.findViewById(R.id.hp3).setVisibility(View.INVISIBLE);
+            this.findViewById(R.id.hp4).setVisibility(View.INVISIBLE);
+            this.findViewById(R.id.hp5).setVisibility(View.INVISIBLE);
+            this.findViewById(R.id.tv).setVisibility(View.INVISIBLE);
+            shoot.setVisibility(View.INVISIBLE);
+            Log.i("ShootBtn", "Invisible:");
+        }
+        shoot.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                String vittlesUrl = setting.getString("vittles_url", "");
+
+                //hp = hp-10;
+                new BackgroundTask(vittlesUrl + "/irSend/" + "KEY_1").execute();
+                Log.i("Shoot", "빵야~");
+            }
+        });
+
+        //jw
         SurfaceView sv = (SurfaceView) this.findViewById(R.id.surface_video);
         SurfaceHolder sh = sv.getHolder();
         sh.addCallback(this);
@@ -189,9 +247,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
         nativeInit();
 
-        setting =  PreferenceManager.getDefaultSharedPreferences(this);
 
-        WifiConnector wifi = new WifiConnector(this, setting.getString("vittles_ap_prefix", ""));
+		WifiConnector wifi = new WifiConnector(this, setting.getString("vittles_ap_prefix", ""));
 //        wifi.init();
         // todo: Perference에 암호 방식과 암호도 저장해야 함!!
         wifi.Connecting(setting.getString("my_vittles_ap", ""), "WPA", "intintint");
@@ -215,11 +272,24 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
         protected void onPostExecute(Integer a) {
             //tv.setText(result);
+            //jw
+            if(60<hp&& hp<=80)
+                findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
+            else if(40<hp&&hp<=60)
+                findViewById(R.id.hp2).setVisibility(View.INVISIBLE);
+            else if(20<hp&&hp<=40)
+                findViewById(R.id.hp3).setVisibility(View.INVISIBLE);
+            else if(0<hp&&hp<=20)
+                findViewById(R.id.hp4).setVisibility(View.INVISIBLE);
+            else if(hp==0)
+                findViewById(R.id.hp5).setVisibility(View.INVISIBLE);
+            tv.setText("HP : "+hp);
         }
 
     }
 
     private String request(String urlStr) {
+    //private String request(String urlStr) {
         StringBuilder output = new StringBuilder();
         try {
             URL url = new URL(urlStr);
@@ -239,18 +309,24 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                         if (line == null) {
                             break;
                         }
+                        Log.i("resultline",line);
+                        hp = Integer.parseInt(line);;
+                        // hp �??�인
                         output.append(line + "\n");
                     }
-
+                    serverconnected=true;
                     reader.close();
                     conn.disconnect();
                 }
+                else
+                    serverconnected=false;
             }
         } catch(Exception ex) {
             Log.e("SampleHTTP", "Exception in processing response.", ex);
             ex.printStackTrace();
         }
 
+        //return hp;
         return output.toString();
     }
 
@@ -315,13 +391,12 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                     steering = 1;
                 } else if (angle > 23 && angle < 157) {
                     steering = 2;
-                } else{
-                    steering =0;
-                }
-                if (angle > -113 && angle < -67)
-                {
+                } else {
                     steering = 0;
-                }  else if (angle > 67  && angle < 113){
+                }
+                if (angle > -113 && angle < -67) {
+                    steering = 0;
+                } else if (angle > 67 && angle < 113) {
                     steering = 0;
                 }
                 /*
@@ -341,6 +416,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
 
+
     protected void onSaveInstanceState(Bundle outState) {
         Log.d("GStreamer", "Saving state, playing:" + is_playing_desired + " position:" + position +
                 " duration: " + duration + " uri: " + mediaUri);
@@ -353,6 +429,11 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
     protected void onDestroy() {
         nativeFinalize();
+        //jw
+        if(serverconnected) {
+            String vittlesUrl = setting.getString("vittles_url", "");
+            new BackgroundTask(vittlesUrl + "/irThreadDisable").execute();
+        }
         if (wake_lock.isHeld())
             wake_lock.release();
         super.onDestroy();
