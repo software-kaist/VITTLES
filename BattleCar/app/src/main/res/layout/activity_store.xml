@@ -13,7 +13,7 @@
    <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="50dip"
-       android:background="@mipmap/sky"
+       android:background="#FFFFFF"
        android:layout_alignParentTop="true"
        android:orientation="horizontal"
 
@@ -22,26 +22,29 @@
        <ImageButton
            android:layout_width="100dip"
            android:layout_height="50dip"
+           android:scaleType="fitXY"
            android:src="@mipmap/gunbtn"/>
        <ImageButton
            android:layout_width="100dip"
            android:layout_height="50dip"
+           android:scaleType="fitXY"
            android:src="@mipmap/bulletbtn"/>
        <ImageButton
            android:layout_width="100dip"
            android:layout_height="50dip"
+           android:scaleType="fitXY"
            android:src="@mipmap/vcoinbtn"/>
        <TextView
            android:layout_width="200dip"
            android:layout_height="50dip"
-           android:background="@color/dim_foreground_disabled_material_light"
+           android:id="@+id/vcoin"
            android:text="V-coin : 1500" />
        <Button
            android:layout_width="50dp"
            android:layout_height="50dp"
            android:background="@mipmap/back"
-           android:id="@+id/Back1Btn"
-           android:onClick="onBack1BtnClicked"/>
+           android:id="@+id/Back3Btn"
+           android:onClick="onBack3BtnClicked"/>
    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,12 +52,14 @@
         android:layout_below="@+id/linearLayout"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:background="@mipmap/sky"
-        android:id="@+id/linearLayout2">
+        android:background="#FFFFFF"
+        android:id="@+id/linearLayout2"
+        android:gravity="center_horizontal">
         <LinearLayout
             android:layout_width="180dip"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
             <ImageView
                 android:layout_width="150dip"
                 android:layout_height="150dip"
@@ -64,13 +69,16 @@
             <ImageButton
                 android:layout_width="150dip"
                 android:layout_height="50dip"
-                android:src="@mipmap/buy"/>
+                android:scaleType="fitXY"
+                android:src="@mipmap/buy"
+                android:onClick="onBuy1BtnClicked"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="180dip"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
             <ImageView
                 android:layout_width="150dip"
                 android:layout_height="150dip"
@@ -80,13 +88,16 @@
             <ImageButton
                 android:layout_width="150dip"
                 android:layout_height="50dip"
-                android:src="@mipmap/buy"/>
+                android:scaleType="fitXY"
+                android:src="@mipmap/buy"
+                android:onClick="onBuy2BtnClicked"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="180dip"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
             <ImageView
                 android:layout_width="150dip"
                 android:layout_height="150dip"
@@ -96,7 +107,9 @@
             <ImageButton
                 android:layout_width="150dip"
                 android:layout_height="50dip"
-                android:src="@mipmap/buy"/>
+                android:scaleType="fitXY"
+                android:src="@mipmap/buy"
+                android:onClick="onBuy3BtnClicked"/>
         </LinearLayout>
     </LinearLayout>
 
