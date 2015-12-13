@@ -57,6 +57,9 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private JoystickView joystick;
     private SharedPreferences setting;
     private VittlesEffector vtEffector;
+    private int preMovement = -1;
+    private int preSteering = -1;
+    private int preWeapon = -1;
 
     //jw
     TextView tv;
@@ -120,6 +123,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         //streamingPlay.setVisibility(View.GONE);
         streamingPlay.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                vtEffector.playEffect(3, 100);
+
                 // todo : Vittels 접속 루틴 여기로 옮겨서 처리!!
                 String vittlesUrl = setting.getString("vittles_url", "");
                 new BackgroundTask(vittlesUrl + "/camonoff/" + mWifiIpAddress).execute();
@@ -350,7 +355,19 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 steering left|right (1|2)
                 "movement,steering,angle(-180~180),power(0~100%),weapon"
                 */
-                vtEffector.playEffect(4, 0);
+
+                // todo : 주행 효과
+//                vtEffector.playEffect(4, 0);
+
+                if ((preMovement == movement) && (preSteering == steering) && (preWeapon == weapon)) {
+                    return;
+                }
+
+                preMovement = movement;
+                preSteering = steering;
+                preWeapon = weapon;
+
+                Log.i("Drive", movement + " " + steering + " " +  weapon);
 
                 String vittlesUrl = setting.getString("vittles_url", "");
                 directionTextView.setText("VITTLES URL: " + vittlesUrl);
