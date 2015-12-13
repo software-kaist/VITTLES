@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import kaist.game.battlecar.service.BluetoothService;
+import kaist.game.battlecar.util.Const;
 
 public class MainActivity extends Activity {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -115,7 +116,7 @@ public class MainActivity extends Activity {
 
     public void onRacingModeBtnClicked(View v) {
         Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
-        intent.putExtra("ShootBtn",false);
+        intent.putExtra(Const.EXTRA_BATTLE_MODE, false);
         startActivity(intent);
     }
 

@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import kaist.game.battlecar.service.BluetoothService;
+import kaist.game.battlecar.util.Const;
 
 public class WaitingRoomActivity extends Activity {
     // Debugging
@@ -253,7 +254,7 @@ public class WaitingRoomActivity extends Activity {
 
     private void startBattleGame() {
         Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
-        intent.putExtra("ShootBtn",true);
+        intent.putExtra(Const.EXTRA_BATTLE_MODE, true);
         startActivity(intent);
     }
 }

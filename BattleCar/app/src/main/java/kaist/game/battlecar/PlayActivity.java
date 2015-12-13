@@ -34,6 +34,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import kaist.game.battlecar.service.CarEventReceiver;
+import kaist.game.battlecar.util.Const;
 import kaist.game.battlecar.util.VittlesEffector;
 import kaist.game.battlecar.util.VittlesConnector;
 import kaist.game.battlecar.view.GStreamerSurfaceView;
@@ -78,7 +79,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     //jw
     TextView tv;
     int hp=100;
-    boolean serverconnected=true;
+    boolean bBattleMode = false;
+    private String mWifiIpAddress;
 
     //private Button shootButton;
     Handler mHandler = new Handler(Looper.getMainLooper()) {
@@ -88,6 +90,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 case CarEventReceiver.SIMSOCK_DATA :
                     String msg = (String) inputMessage.obj;
                     hp = Integer.parseInt(msg);
+                    vtEffector.playEffect(1, 300);
                     Log.d(TAG, "My HP : "+msg);
                     break;
 
@@ -157,19 +160,19 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
         WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
         int ip = wm.getConnectionInfo().getIpAddress();
-        final String wifiIpAddress = String.format("%d.%d.%d.%d",
+        mWifiIpAddress = String.format("%d.%d.%d.%d",
                 (ip & 0xff),
                 (ip >> 8 & 0xff),
                 (ip >> 16 & 0xff),
                 (ip >> 24 & 0xff));
 
-        ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
-        play.setOnClickListener(new OnClickListener() {
+        ImageButton streamingPlay = (ImageButton) this.findViewById(R.id.button_play);
+        streamingPlay.setVisibility(View.GONE);
+        streamingPlay.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                vtEffector.playEffect(3, 100);
                 // todo : Vittels 접속 루틴 여기로 옮겨서 처리!!
-                String vittlesUrl = setting.getString("vittles_url", "");
-                new BackgroundTask(vittlesUrl + "/camonoff/" + wifiIpAddress).execute();
+                //String vittlesUrl = setting.getString("vittles_url", "");
+                //new BackgroundTask(vittlesUrl + "/camonoff/" + wifiIpAddress).execute();
 
             }
         });
@@ -186,34 +189,35 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         //jw
         tv= (TextView)findViewById(R.id.tv);
         Button shoot = (Button) this.findViewById(R.id.button_Shoot);
-        if(getIntent().getBooleanExtra("ShootBtn",false)){
-            this.findViewById(R.id.hp1).setVisibility(View.VISIBLE);
-            this.findViewById(R.id.hp2).setVisibility(View.VISIBLE);
-            this.findViewById(R.id.hp3).setVisibility(View.VISIBLE);
-            this.findViewById(R.id.hp4).setVisibility(View.VISIBLE);
-            this.findViewById(R.id.hp5).setVisibility(View.VISIBLE);
-            this.findViewById(R.id.tv).setVisibility(View.VISIBLE);
-            shoot.setVisibility(View.VISIBLE);
-            String vittlesUrl = setting.getString("vittles_url", "");
-            new BackgroundTask(vittlesUrl + "/irThreadEnable").execute();
-            Log.i("Battle", "Start");
-            Log.i("ShootBtn", "Visible:");
-        }
-        else
-        {
-            this.findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
-            this.findViewById(R.id.hp2).setVisibility(View.INVISIBLE);
-            this.findViewById(R.id.hp3).setVisibility(View.INVISIBLE);
-            this.findViewById(R.id.hp4).setVisibility(View.INVISIBLE);
-            this.findViewById(R.id.hp5).setVisibility(View.INVISIBLE);
-            this.findViewById(R.id.tv).setVisibility(View.INVISIBLE);
-            shoot.setVisibility(View.INVISIBLE);
-            Log.i("ShootBtn", "Invisible:");
+        if (getIntent()!=null && getIntent().hasExtra(Const.EXTRA_BATTLE_MODE)) {
+            bBattleMode = getIntent().getBooleanExtra(Const.EXTRA_BATTLE_MODE, false);
+            if (bBattleMode) {
+                this.findViewById(R.id.hp1).setVisibility(View.VISIBLE);
+                this.findViewById(R.id.hp2).setVisibility(View.VISIBLE);
+                this.findViewById(R.id.hp3).setVisibility(View.VISIBLE);
+                this.findViewById(R.id.hp4).setVisibility(View.VISIBLE);
+                this.findViewById(R.id.hp5).setVisibility(View.VISIBLE);
+                this.findViewById(R.id.tv).setVisibility(View.VISIBLE);
+                shoot.setVisibility(View.VISIBLE);
+                String vittlesUrl = setting.getString("vittles_url", "");
+                new BackgroundTask(vittlesUrl + "/irThreadEnable").execute();
+                Log.i("Battle", "Start");
+                Log.i("ShootBtn", "Visible:");
+            } else {
+                this.findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
+                this.findViewById(R.id.hp2).setVisibility(View.INVISIBLE);
+                this.findViewById(R.id.hp3).setVisibility(View.INVISIBLE);
+                this.findViewById(R.id.hp4).setVisibility(View.INVISIBLE);
+                this.findViewById(R.id.hp5).setVisibility(View.INVISIBLE);
+                this.findViewById(R.id.tv).setVisibility(View.INVISIBLE);
+                shoot.setVisibility(View.INVISIBLE);
+                Log.i("ShootBtn", "Invisible:");
+            }
         }
         shoot.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                vtEffector.playEffect(2, 200);
+                vtEffector.playEffect(2, 100);
                 String vittlesUrl = setting.getString("vittles_url", "");
                 //hp = hp-10;
                 new BackgroundTask(vittlesUrl + "/irSend/" + "KEY_1").execute();
@@ -279,7 +283,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 		
         CarEventReceiver mCarEventReceiver = new CarEventReceiver(this, mHandler);
         mCarEventReceiver.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
-
+        new BackgroundTask(setting.getString("vittles_url", "") + "/camonoff/" + mWifiIpAddress).execute();
     }
 
     class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
@@ -446,15 +450,16 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         outState.putString("last_folder", last_folder);
     }
 
+    @Override
     protected void onDestroy() {
         nativeFinalize();
-        //jw
-        //if(serverconnected) {
+        if (bBattleMode) {
             String vittlesUrl = setting.getString("vittles_url", "");
             new BackgroundTask(vittlesUrl + "/irThreadDisable").execute();
-        //}
+        }
         if (wake_lock.isHeld())
             wake_lock.release();
+        new BackgroundTask(setting.getString("vittles_url", "") + "/camonoff/" + mWifiIpAddress).execute();
         super.onDestroy();
         android.os.Process.killProcess(android.os.Process.myPid());
     }
