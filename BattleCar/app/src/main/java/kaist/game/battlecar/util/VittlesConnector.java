@@ -1,9 +1,6 @@
 package kaist.game.battlecar.util;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -17,8 +14,8 @@ import kaist.game.battlecar.adapter.CarApList;
 /**
  * Created by SUNgHOOn on 2015-12-13.
  */
-public class WifiConnector {
-    private final static String TAG = WifiConnector.class.getSimpleName();
+public class VittlesConnector {
+    private final static String TAG = VittlesConnector.class.getSimpleName();
     private Context ctx;
     private WifiManager wm;
     private List apList;
@@ -26,7 +23,7 @@ public class WifiConnector {
     private ScanResult scanResult;
     private String vittlesPrefix;
 
-    public WifiConnector(Context ctx, String prefix) {
+    public VittlesConnector(Context ctx, String prefix) {
         this.ctx = ctx;
         this.vittlesPrefix = prefix;
         init();

@@ -4,15 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -24,7 +20,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,11 +27,11 @@ import org.freedesktop.gstreamer.GStreamer;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import kaist.game.battlecar.util.WifiConnector;
+import kaist.game.battlecar.util.VittlesEffector;
+import kaist.game.battlecar.util.VittlesConnector;
 import kaist.game.battlecar.view.GStreamerSurfaceView;
 import kaist.game.battlecar.view.JoystickView;
 
@@ -73,23 +68,23 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private TextView directionTextView;
     private JoystickView joystick;
     private SharedPreferences setting;
+    private VittlesEffector vtEffector;
 
     //jw
     TextView tv;
     int hp=100;
     boolean serverconnected=true;
 
+
     //private Button shootButton;
 
     // Called when the activity is first created.
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         setting =  PreferenceManager.getDefaultSharedPreferences(this);
+
         // Initialize GStreamer and warn if it fails
         try {
             GStreamer.init(this);
@@ -104,12 +99,10 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
-
         currentApiVersion = android.os.Build.VERSION.SDK_INT;
 
         // This work only for android 4.4+
-        if(currentApiVersion >= Build.VERSION_CODES.KITKAT)
-        {
+        if(currentApiVersion >= Build.VERSION_CODES.KITKAT) {
             final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -147,11 +140,14 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 (ip >> 8 & 0xff),
                 (ip >> 16 & 0xff),
                 (ip >> 24 & 0xff));
+
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                // todo : Vittels 접속 루틴 여기로 옮겨서 처리!!
                 String vittlesUrl = setting.getString("vittles_url", "");
                 new BackgroundTask(vittlesUrl + "/camonoff/" + wifiIpAddress).execute();
+
             }
         });
 
@@ -179,9 +175,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             new BackgroundTask(vittlesUrl + "/irThreadEnable").execute();
             Log.i("Battle", "Start");
             Log.i("ShootBtn", "Visible:");
-        }
-        else
-        {
+        } else {
             this.findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
             this.findViewById(R.id.hp2).setVisibility(View.INVISIBLE);
             this.findViewById(R.id.hp3).setVisibility(View.INVISIBLE);
@@ -194,10 +188,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         shoot.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                vtEffector.playEffect(2, 200);
                 String vittlesUrl = setting.getString("vittles_url", "");
-
                 //hp = hp-10;
                 new BackgroundTask(vittlesUrl + "/irSend/" + "KEY_1").execute();
                 Log.i("Shoot", "빵야~");
@@ -247,11 +239,15 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
         nativeInit();
 
-
-		WifiConnector wifi = new WifiConnector(this, setting.getString("vittles_ap_prefix", ""));
-//        wifi.init();
+        // todo : Vittles 자동 접속을 여기서 하면 최초 한번만 하게됨! Click 시로 변경 요망!
+		VittlesConnector wifi = new VittlesConnector(this, setting.getString("vittles_ap_prefix", ""));
         // todo: Perference에 암호 방식과 암호도 저장해야 함!!
         wifi.Connecting(setting.getString("my_vittles_ap", ""), "WPA", "intintint");
+
+        // Init Vittles Effector
+        vtEffector = new VittlesEffector(getBaseContext());
+        vtEffector.addSound(1, R.raw.explosion6);
+        vtEffector.addSound(2, R.raw.gunshot);
     }
 
     class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
