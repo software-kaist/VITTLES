@@ -8,30 +8,26 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import kaist.game.battlecar.adapter.CarApList;
 import kaist.game.battlecar.adapter.CarApListAdapter;
-import kaist.game.battlecar.util.WifiConnector;
+import kaist.game.battlecar.util.VittlesConnector;
 
 public class CarChangeActivity extends Activity implements AdapterView.OnItemClickListener {
     private final static String TAG = CarChangeActivity.class.getSimpleName();
     private ArrayList<CarApList> arrList = new ArrayList<CarApList>();
     private CarApListAdapter carListAdapter;
     private SharedPreferences setting;
-    private WifiConnector wifi;
+    private VittlesConnector wifi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +35,7 @@ public class CarChangeActivity extends Activity implements AdapterView.OnItemCli
         setContentView(R.layout.activity_car_change);
 
         setting =  PreferenceManager.getDefaultSharedPreferences(this);
-        wifi = new WifiConnector(this, setting.getString("vittles_ap_prefix", ""));
+        wifi = new VittlesConnector(this, setting.getString("vittles_ap_prefix", ""));
 
         searchVittles();
     }
@@ -63,7 +59,7 @@ public class CarChangeActivity extends Activity implements AdapterView.OnItemCli
             list.setOnItemClickListener(this);
         } else {
             // todo : VITTLES 없으면 메세지 표시(재검색 또는 중지)
-            Toast.makeText(this, "VITTLES가 검색 안되었습니다.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "VITTLES가 검색되지 않았습니다.", Toast.LENGTH_LONG).show();
         }
     }
 

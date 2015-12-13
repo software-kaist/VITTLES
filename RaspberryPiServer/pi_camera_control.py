@@ -25,6 +25,7 @@ capture_flag = 0
 mCamera = 0
 mPlayer = 0
 globalThread = 0
+mVITTLESAppIP = 0
 
 #Motor 1 GPIO Pin
 IC1_A = 27
@@ -81,7 +82,7 @@ def camera_on():
 
 @app.route("/cameraoff", methods=['GET', 'POST'])
 def camera_off():
-    global subproc, flag, onair_flag
+    global mCamera, subproc, flag, onair_flag
     if onair_flag == 1:
         #os.killpg(subproc.pid, signal.SIGKILL)
         mCamera.capture('hochan.jpg', use_video_port=True)
@@ -104,7 +105,7 @@ cmd1 = "raspivid -t 0 -h 200 -w 355 -fps 20 -hf -vf -b 2000000 -o - | gst-launch
 
 @app.route('/camonoff/<client_ip>')
 def cam_onoff(client_ip):
-    global subproc, flag
+    global subproc, flag, mVITTLESAppIP
     #fwd = request.environ.get('HTTP_X_FORWARDED_FOR', None)
     #if fwd is None:
     #    clientIP = request.remote_addr
@@ -118,7 +119,7 @@ def cam_onoff(client_ip):
     #print("Headers \n " + str(request.headers))
     #print("Data : " + str(request.data))
     print("-------------------------------------------------------\n")
-        
+    mVITTLESAppIP = client_ip
     if flag == 1:
         os.killpg(subproc.pid, signal.SIGKILL)
         flag = 0
@@ -149,22 +150,25 @@ def sendIRSignalQRemote(input_id):
     pass
 
 class irThread (threading.Thread):
-    def __init__(self, threadID, name, energy):
+    def __init__(self, threadID, name, HP):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.energy= energy
+        self.HP = HP
         self.signal = True
 
     def run(self):
         print "Starting" + self.name
-        while self.energy and self.signal:
+        while self.signal:
             hit = lirc.nextcode()
             if not hit :
                 print ("not hit")
             else :
-                self.energy = self.energy - 10
-                print ("hit: %s , energy: %d" % (hit , self.energy))
+                self.HP = self.HP - 10
+                if(self.HP < 0)
+                    self.HP = 0;
+                notifyBattleCarHP(self.HP)
+                print ("hit: %s , HP: %d" % (hit , self.HP))
             time.sleep(0.2)
         print "Exiting" + self.name
 
@@ -255,6 +259,13 @@ def irSend(command):
     while pygame.mixer.music.get_busy() == True:
         continue
 
+def notifyBattleCarHP(HP):
+    global mVITTLESAppIP
+    s = socket(AF_INET, SOCK_STREAM)
+    s.connect((mVITTLESAppIP, 4445))
+    s.send(str(HP) +'\n')
+    s.close()
+
 def networkRecording(a):
     # Connect a client socket to my_server:8000 (change my_server to the
     # hostname of your server)
@@ -295,7 +306,7 @@ def rtmpStreamer(a):
 
     connection = server_socket.accept()[0].makefile('rb')
     try:
-        cmdline = 'ffmpeg -i - -vcodec copy -an -r 25 -f flv -metadata streamName=myStream tcp://0.0.0.0:6666'
+        cmdline = 'ffmpeg -i - -vcodec copy -an -r 25 -flags +global_header -f flv -metadata streamName=myStream tcp://0.0.0.0:6666'
         mPlayer = subprocess.Popen(cmdline.split(), stdin=subprocess.PIPE)
         while True:
             data = connection.read(1024)

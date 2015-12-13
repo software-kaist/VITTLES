@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
     }
 
     private void BTSetup(boolean isOwner) {
-		mIsOwner = isOwner;
+        mIsOwner = isOwner;
         if(btService == null) {
             btService = BluetoothService.getInstance(this);
             btService.setHandler(mHandler);
