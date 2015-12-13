@@ -16,11 +16,11 @@ import android.widget.Toast;
 
 import kaist.game.battlecar.service.BluetoothService;
 import kaist.game.battlecar.util.Const;
+import kaist.game.battlecar.util.Utils;
 
 public class MainActivity extends Activity {
     private final static String TAG = MainActivity.class.getSimpleName();
     private BluetoothService btService = null;
-    private int currentApiVersion;
     private boolean mIsOwner = false;
 
     private final Handler mHandler = new Handler() {
@@ -35,38 +35,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-
-        currentApiVersion = android.os.Build.VERSION.SDK_INT;
-
-        // This work only for android 4.4+
-        if(currentApiVersion >= Build.VERSION_CODES.KITKAT) {
-            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            getWindow().getDecorView().setSystemUiVisibility(flags);
-
-            // Code below is to handle presses of Volume up or Volume down.
-            // Without this, after pressing volume buttons, the navigation bar will
-            // show up and won't hide
-            final View decorView = getWindow().getDecorView();
-            decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-                @Override
-                public void onSystemUiVisibilityChange(int visibility) {
-                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                        decorView.setSystemUiVisibility(flags);
-                    }
-                }
-            });
-        }
-
         setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    protected void onResume() {
+        Utils.setCleanView(this, false);
+        super.onResume();
     }
 
     public void onChangeCarBtnClicked(View v) {
@@ -161,7 +136,7 @@ public class MainActivity extends Activity {
                 Toast.makeText(getApplicationContext(), "Your devices is not supported bluetooth", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Toast.makeText(getApplicationContext(),"Bluetooth is already enabled", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"Bluetooth is already enabled", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getApplicationContext(), WaitingRoomActivity.class);
             intent.putExtra(WaitingRoomActivity.EXTRA_ROOM_OWNER, isOwner);
             startActivity(intent);

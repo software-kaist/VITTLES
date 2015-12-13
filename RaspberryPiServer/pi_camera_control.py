@@ -165,7 +165,7 @@ class irThread (threading.Thread):
                 print ("not hit")
             else :
                 self.HP = self.HP - 10
-                if(self.HP < 0)
+                if self.HP < 0:
                     self.HP = 0;
                 notifyBattleCarHP(self.HP)
                 print ("hit: %s , HP: %d" % (hit , self.HP))
@@ -289,7 +289,7 @@ def networkRecording(a):
             # seconds, then stop
             camera.start_recording(connection, format='h264')
             print 'start_recording'
-            camera.wait_recording(2400)
+            camera.wait_recording(24000)
     finally:
         global mPlayer
         connection.close()

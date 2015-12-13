@@ -24,22 +24,48 @@
         android:background="@mipmap/car_1"
         android:id="@+id/Car1Btn"
         android:layout_alignTop="@+id/imageView"
-        android:layout_marginLeft="25dp"/>
+        android:layout_marginLeft="25dp"
+        android:visibility="gone" />
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Car1Btn"
+        android:layout_marginTop="0dp"
+        android:paddingTop="0dp"
+        android:layout_marginLeft="25dp"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:id="@+id/car1_name"
+        android:visibility="gone" />
 
     <Button
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:id="@+id/Car2Btn"
+        android:visibility="gone"
         android:background="@mipmap/car_2"
-        android:layout_below="@+id/Car1Btn"
+        android:layout_below="@+id/car1_name"
         android:nestedScrollingEnabled="true"
+        android:layout_marginTop="20dp"
         android:layout_marginLeft="25dp"/>
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Car2Btn"
+        android:layout_marginTop="0dp"
+        android:paddingTop="0dp"
+        android:layout_marginLeft="25dp"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:visibility="gone"
+        android:id="@+id/car2_name"/>
 
     <Button
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/XBtn"
         android:background="@mipmap/x"
+        android:visibility="gone"
         android:nestedScrollingEnabled="true"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import kaist.game.battlecar.adapter.CarApList;
 import kaist.game.battlecar.adapter.CarApListAdapter;
+import kaist.game.battlecar.util.Utils;
 import kaist.game.battlecar.util.VittlesConnector;
 
 public class CarChangeActivity extends Activity implements AdapterView.OnItemClickListener {
@@ -38,6 +39,12 @@ public class CarChangeActivity extends Activity implements AdapterView.OnItemCli
         wifi = new VittlesConnector(this, setting.getString("vittles_ap_prefix", ""));
 
         searchVittles();
+    }
+
+    @Override
+    protected void onResume() {
+        Utils.setCleanView(this, false);
+        super.onResume();
     }
 
     private BroadcastReceiver wifiReceiver = new BroadcastReceiver() {

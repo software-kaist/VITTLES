@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import kaist.game.battlecar.util.Utils;
+
 public class StoreActivity extends Activity {
 
     TextView Vcoin;
@@ -20,6 +22,11 @@ public class StoreActivity extends Activity {
         Vcoin= (TextView)findViewById(R.id.vcoin);
     }
 
+    @Override
+    protected void onResume() {
+        Utils.setCleanView(this, false);
+        super.onResume();
+    }
 
     public void onBack3BtnClicked(View v) {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);

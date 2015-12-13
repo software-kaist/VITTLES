@@ -2,13 +2,10 @@ package kaist.game.battlecar;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -19,8 +16,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -35,8 +30,9 @@ import java.net.URL;
 
 import kaist.game.battlecar.service.CarEventReceiver;
 import kaist.game.battlecar.util.Const;
-import kaist.game.battlecar.util.VittlesEffector;
+import kaist.game.battlecar.util.Utils;
 import kaist.game.battlecar.util.VittlesConnector;
+import kaist.game.battlecar.util.VittlesEffector;
 import kaist.game.battlecar.view.GStreamerSurfaceView;
 import kaist.game.battlecar.view.JoystickView;
 
@@ -53,21 +49,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private native void nativeSurfaceFinalize(); // Surface about to be destroyed
     private long native_custom_data;      // Native code will use this to keep private data
 
-    private boolean is_playing_desired;   // Whether the user asked to go to PLAYING
-    private int position;                 // Current position, reported by native code
-    private int duration;                 // Current clip duration, reported by native code
-    private boolean is_local_media;       // Whether this clip is stored locally or is being streamed
-    private int desired_position;         // Position where the users wants to seek to
-    private String mediaUri;              // URI of the clip being played
-
-    private final String defaultMediaUri = "http://docs.gstreamer.com/media/sintel_trailer-368p.ogv";
-
-    static private final int PICK_FILE_CODE = 1;
-    private String last_folder;
-
     private PowerManager.WakeLock wake_lock;
-
-    private int currentApiVersion;
 
     private TextView angleTextView;
     private TextView powerTextView;
@@ -82,7 +64,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     boolean bBattleMode = false;
     private String mWifiIpAddress;
 
-    //private Button shootButton;
     Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message inputMessage) {
@@ -97,11 +78,9 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 case CarEventReceiver.SIMSOCK_CONNECTED :
                 case CarEventReceiver.SIMSOCK_DISCONNECTED :
                     break;
-
             }
         }
     };
-
 
     // Called when the activity is first created.
     @Override
@@ -119,36 +98,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             return;
         }
 
-        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-
-        currentApiVersion = android.os.Build.VERSION.SDK_INT;
-
-        // This work only for android 4.4+
-        if(currentApiVersion >= Build.VERSION_CODES.KITKAT) {
-            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            getWindow().getDecorView().setSystemUiVisibility(flags);
-
-            // Code below is to handle presses of Volume up or Volume down.
-            // Without this, after pressing volume buttons, the navigation bar will
-            // show up and won't hide
-            final View decorView = getWindow().getDecorView();
-            decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-                @Override
-                public void onSystemUiVisibilityChange(int visibility) {
-                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                        decorView.setSystemUiVisibility(flags);
-                    }
-                }
-            });
-        }
+        Utils.setCleanView(this, true);
 
         setContentView(R.layout.activity_play);
 
@@ -167,12 +117,12 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 (ip >> 24 & 0xff));
 
         ImageButton streamingPlay = (ImageButton) this.findViewById(R.id.button_play);
-        streamingPlay.setVisibility(View.GONE);
+        //streamingPlay.setVisibility(View.GONE);
         streamingPlay.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 // todo : Vittels 접속 루틴 여기로 옮겨서 처리!!
-                //String vittlesUrl = setting.getString("vittles_url", "");
-                //new BackgroundTask(vittlesUrl + "/camonoff/" + wifiIpAddress).execute();
+                String vittlesUrl = setting.getString("vittles_url", "");
+                new BackgroundTask(vittlesUrl + "/camonoff/" + mWifiIpAddress).execute();
 
             }
         });
@@ -230,38 +180,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         SurfaceHolder sh = sv.getHolder();
         sh.addCallback(this);
 
-        // Retrieve our previous state, or initialize it to default values
-        if (savedInstanceState != null) {
-            is_playing_desired = savedInstanceState.getBoolean("playing");
-            position = savedInstanceState.getInt("position");
-            duration = savedInstanceState.getInt("duration");
-            mediaUri = savedInstanceState.getString("mediaUri");
-            last_folder = savedInstanceState.getString("last_folder");
-            Log.i ("GStreamer", "Activity created with saved state:");
-        } else {
-            is_playing_desired = false;
-            position = duration = 0;
-            last_folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath();
-            Intent intent = getIntent();
-            android.net.Uri uri = intent.getData();
-            if (uri == null)
-                mediaUri = defaultMediaUri;
-            else {
-                Log.i ("GStreamer", "Received URI: " + uri);
-                if (uri.getScheme().equals("content")) {
-                    android.database.Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-                    cursor.moveToFirst();
-                    mediaUri = "file://" + cursor.getString(cursor.getColumnIndex(android.provider.MediaStore.Video.Media.DATA));
-                    cursor.close();
-                } else
-                    mediaUri = uri.toString();
-            }
-            Log.i ("GStreamer", "Activity created with no saved state:");
-        }
-        is_local_media = false;
-        Log.i("GStreamer", "  playing:" + is_playing_desired + " position:" + position +
-                " duration: " + duration + " uri: " + mediaUri);
-
         // Start with disabled buttons, until native code is initialized
         this.findViewById(R.id.button_play).setEnabled(false);
         this.findViewById(R.id.button_stop).setEnabled(false);
@@ -275,7 +193,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
         // Init Vittles Effector
         vtEffector = new VittlesEffector(getBaseContext());
-        vtEffector.setOption( setting.getBoolean("vibration_switch", true), setting.getBoolean("sound_effect_switch", true), true);
+        vtEffector.setOption(setting.getBoolean("vibration_switch", true), setting.getBoolean("sound_effect_switch", true), true);
         vtEffector.addSound(1, R.raw.explosion6);
         vtEffector.addSound(2, R.raw.gunshot);
         vtEffector.addSound(3, R.raw.car_start);
@@ -283,7 +201,13 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 		
         CarEventReceiver mCarEventReceiver = new CarEventReceiver(this, mHandler);
         mCarEventReceiver.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
-        new BackgroundTask(setting.getString("vittles_url", "") + "/camonoff/" + mWifiIpAddress).execute();
+        //new BackgroundTask(setting.getString("vittles_url", "") + "/camonoff/" + mWifiIpAddress).execute();
+    }
+
+    @Override
+    protected void onResume() {
+        Utils.setCleanView(this, false);
+        super.onResume();
     }
 
     class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
@@ -303,7 +227,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         }
 
         protected void onPostExecute(Integer a) {
-            //tv.setText(result);
             //jw
             if(60<hp&& hp<=80)
                 findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
@@ -349,7 +272,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             ex.printStackTrace();
         }
 
-        //return hp;
         return output.toString();
     }
 
@@ -440,16 +362,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
 
-    protected void onSaveInstanceState(Bundle outState) {
-        Log.d("GStreamer", "Saving state, playing:" + is_playing_desired + " position:" + position +
-                " duration: " + duration + " uri: " + mediaUri);
-        outState.putBoolean("playing", is_playing_desired);
-        outState.putInt("position", position);
-        outState.putInt("duration", duration);
-        outState.putString("mediaUri", mediaUri);
-        outState.putString("last_folder", last_folder);
-    }
-
     @Override
     protected void onDestroy() {
         nativeFinalize();
@@ -459,7 +371,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         }
         if (wake_lock.isHeld())
             wake_lock.release();
-        new BackgroundTask(setting.getString("vittles_url", "") + "/camonoff/" + mWifiIpAddress).execute();
+        //new BackgroundTask(setting.getString("vittles_url", "") + "/camonoff/" + mWifiIpAddress).execute();
         super.onDestroy();
         android.os.Process.killProcess(android.os.Process.myPid());
     }
@@ -476,19 +388,16 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
     // Set the URI to play, and record whether it is a local or remote file
     private void setMediaUri() {
-        //nativeSetUri (mediaUri);
-        //is_local_media = mediaUri.startsWith("file://");
     }
 
     // Called from native code. Native code calls this once it has created its pipeline and
     // the main loop is running, so it is ready to accept commands.
     private void onGStreamerInitialized () {
         Log.i ("GStreamer", "GStreamer initialized:");
-        Log.i ("GStreamer", "  playing:" + is_playing_desired + " position:" + position + " uri: " + mediaUri);
 
         // Restore previous playing state
         setMediaUri ();
-        nativeSetPosition (position);
+        nativeSetPosition (0);
         //if (is_playing_desired) {
             nativePlay();
             wake_lock.acquire();
@@ -511,21 +420,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
     // Called from native code
     private void setCurrentPosition(final int position, final int duration) {
-        /*final SeekBar sb = (SeekBar) this.findViewById(R.id.seek_bar);
-
-        // Ignore position messages from the pipeline if the seek bar is being dragged
-        if (sb.isPressed()) return;
-
-        runOnUiThread (new Runnable() {
-            public void run() {
-                sb.setMax(duration);
-                sb.setProgress(position);
-                updateTimeWidget();
-                sb.setEnabled(duration != 0);
-            }
-        });*/
-        this.position = position;
-        this.duration = duration;
     }
 
     static {
