@@ -9,6 +9,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -30,12 +33,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import kaist.game.battlecar.service.CarEventReceiver;
 import kaist.game.battlecar.util.VittlesEffector;
 import kaist.game.battlecar.util.VittlesConnector;
 import kaist.game.battlecar.view.GStreamerSurfaceView;
 import kaist.game.battlecar.view.JoystickView;
 
 public class PlayActivity extends Activity implements SurfaceHolder.Callback {
+    private final static String TAG = PlayActivity.class.getSimpleName();
     private native void nativeInit();     // Initialize native code, build pipeline, etc
     private native void nativeFinalize(); // Destroy pipeline and shutdown native code
     private native void nativeSetUri(String uri); // Set the URI of the media to play
@@ -75,8 +80,25 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     int hp=100;
     boolean serverconnected=true;
 
-
     //private Button shootButton;
+    Handler mHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message inputMessage) {
+            switch(inputMessage.what){
+                case CarEventReceiver.SIMSOCK_DATA :
+                    String msg = (String) inputMessage.obj;
+                    hp = Integer.parseInt(msg);
+                    Log.d(TAG, "My HP : "+msg);
+                    break;
+
+                case CarEventReceiver.SIMSOCK_CONNECTED :
+                case CarEventReceiver.SIMSOCK_DISCONNECTED :
+                    break;
+
+            }
+        }
+    };
+
 
     // Called when the activity is first created.
     @Override
@@ -176,7 +198,9 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             new BackgroundTask(vittlesUrl + "/irThreadEnable").execute();
             Log.i("Battle", "Start");
             Log.i("ShootBtn", "Visible:");
-        } else {
+        }
+        else
+        {
             this.findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
             this.findViewById(R.id.hp2).setVisibility(View.INVISIBLE);
             this.findViewById(R.id.hp3).setVisibility(View.INVISIBLE);
@@ -250,6 +274,10 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         vtEffector.setOption( setting.getBoolean("vibration_switch", true), setting.getBoolean("sound_effect_switch", true), true);
         vtEffector.addSound(1, R.raw.explosion6);
         vtEffector.addSound(2, R.raw.gunshot);
+		
+        CarEventReceiver mCarEventReceiver = new CarEventReceiver(this, mHandler);
+        mCarEventReceiver.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
+
     }
 
     class BackgroundTask extends AsyncTask<Integer, Integer, Integer> {
@@ -287,16 +315,13 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     }
 
     private String request(String urlStr) {
-    //private String request(String urlStr) {
         StringBuilder output = new StringBuilder();
         try {
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
             if (conn != null) {
-                conn.setConnectTimeout(10000);
-                //conn.setRequestMethod("GET");
-                //conn.setDoInput(true);
-                //conn.setDoOutput(true);
+                conn.setConnectTimeout(1000);
+                conn.setRequestMethod("GET");
 
                 int resCode = conn.getResponseCode();
                 if (resCode == HttpURLConnection.HTTP_OK) {
@@ -307,20 +332,14 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                         if (line == null) {
                             break;
                         }
-                        Log.i("resultline",line);
-                        hp = Integer.parseInt(line);;
-                        // hp �??�인
                         output.append(line + "\n");
                     }
-                    serverconnected=true;
                     reader.close();
                     conn.disconnect();
                 }
-                else
-                    serverconnected=false;
             }
         } catch(Exception ex) {
-            Log.e("SampleHTTP", "Exception in processing response.", ex);
+            Log.e(TAG, "Exception in processing response.", ex);
             ex.printStackTrace();
         }
 
@@ -414,7 +433,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
 
-
     protected void onSaveInstanceState(Bundle outState) {
         Log.d("GStreamer", "Saving state, playing:" + is_playing_desired + " position:" + position +
                 " duration: " + duration + " uri: " + mediaUri);
@@ -428,10 +446,10 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     protected void onDestroy() {
         nativeFinalize();
         //jw
-        if(serverconnected) {
+        //if(serverconnected) {
             String vittlesUrl = setting.getString("vittles_url", "");
             new BackgroundTask(vittlesUrl + "/irThreadDisable").execute();
-        }
+        //}
         if (wake_lock.isHeld())
             wake_lock.release();
         super.onDestroy();
