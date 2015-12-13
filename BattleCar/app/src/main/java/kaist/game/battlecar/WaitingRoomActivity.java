@@ -74,8 +74,7 @@ public class WaitingRoomActivity extends Activity {
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     if (readMessage.length() > 0) {
                         if(readMessage.equals(getString(R.string.start_battle))) {
-                            Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
-                            startActivity(intent);
+                            startBattleGame();
                         }
                         Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
                     }
@@ -159,8 +158,7 @@ public class WaitingRoomActivity extends Activity {
             @Override
             public void onClick(View v) {
                 sendMessage(getString(R.string.start_battle));
-                Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
-                startActivity(intent);
+                startBattleGame();
             }
         });
     }
@@ -251,5 +249,11 @@ public class WaitingRoomActivity extends Activity {
             discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
             startActivity(discoverableIntent);
         }
+    }
+
+    private void startBattleGame() {
+        Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+        intent.putExtra("ShootBtn",true);
+        startActivity(intent);
     }
 }

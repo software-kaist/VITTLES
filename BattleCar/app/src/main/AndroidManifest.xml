@@ -78,7 +78,7 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
         </activity>
-		<activity
+        <activity
             android:name=".StoreActivity"
             android:label="StoreActivity"
             android:screenOrientation="landscape">
