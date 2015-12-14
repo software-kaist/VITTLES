@@ -39,12 +39,6 @@
            android:layout_height="50dip"
            android:id="@+id/vcoin"
            android:text="V-coin : 1500" />
-       <Button
-           android:layout_width="50dp"
-           android:layout_height="50dp"
-           android:background="@mipmap/back"
-           android:id="@+id/Back3Btn"
-           android:onClick="onBack3BtnClicked"/>
    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -112,5 +106,15 @@
                 android:onClick="onBuy3BtnClicked"/>
         </LinearLayout>
     </LinearLayout>
+
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@mipmap/back"
+        android:id="@+id/Back3Btn"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:onClick="onBack3BtnClicked"/>
+    <!--android:layout_marginRight="20dp"-->
 
 </RelativeLayout>

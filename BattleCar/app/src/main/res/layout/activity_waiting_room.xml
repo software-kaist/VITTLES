@@ -75,11 +75,13 @@
         android:layout_height="50dp"
         android:background="@mipmap/back"
         android:id="@+id/button_back"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:onClick="onBack1BtnClicked"/>
+
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:layout_marginTop="10dp"-->
+
     <ImageButton
         android:layout_width="50dp"
         android:layout_height="50dp"

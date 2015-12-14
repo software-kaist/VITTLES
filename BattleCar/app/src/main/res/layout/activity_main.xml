@@ -104,11 +104,12 @@
         android:background="@mipmap/back"
         android:id="@+id/Back1Btn"
         android:visibility="gone"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:onClick="onBack1BtnClicked"/>
+
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:layout_marginTop="10dp"-->
 
     <Button
         android:layout_width="50dp"
