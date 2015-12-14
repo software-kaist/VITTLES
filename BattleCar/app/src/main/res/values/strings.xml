@@ -45,9 +45,9 @@
     <!-- Network Setting -->
     <string name="pref_header_network">Network</string>
     <string name="pref_title_vittles_url">VITTLES URL</string>
-    <string name="pref_default_vittles_url">http://jwlee.iptime.org:8888</string>
+    <string name="pref_default_vittles_url">http://192.168.42.1:8888</string>
     <string name="pref_title_my_vittles_ap">MY VITTLES NAME</string>
-    <string name="pref_default_my_vittles_ap">MSD_VITTLES</string>
+    <string name="pref_default_my_vittles_ap">NO_VITTLES</string>
     <string name="title_activity_waiting_room">WaitingRoomActivity</string>
     <string name="not_connected">Not connected</string>
     <string name="start_battle">start_battle</string>

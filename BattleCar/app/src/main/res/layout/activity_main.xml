@@ -10,6 +10,33 @@
 
     <!-- android:background="@android:color/transparent" -->
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout1"
+        android:background="#700099cc">
+
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/searchBtn"
+            android:background="@mipmap/mycar03"
+            android:nestedScrollingEnabled="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My VITTLES Name:"
+            android:id="@+id/textViewName"
+            android:typeface="monospace"/>
+
+        <!--android:layout_toRightOf="@id/searchBtn"-->
+    </LinearLayout>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,14 +96,14 @@
         android:onClick="onBattleModeBtnClicked"/>
 
     <Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="RacingMode"
-    android:id="@+id/RacingModeBtn"
-    android:visibility="gone"
-    android:layout_below="@+id/BattleModeBtn"
-    android:layout_alignEnd="@+id/SettingBtn"
-    android:onClick="onRacingModeBtnClicked"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RacingMode"
+        android:id="@+id/RacingModeBtn"
+        android:visibility="gone"
+        android:layout_below="@+id/BattleModeBtn"
+        android:layout_alignEnd="@+id/SettingBtn"
+        android:onClick="onRacingModeBtnClicked"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -108,18 +135,14 @@
         android:layout_alignParentRight="true"
         android:onClick="onBack1BtnClicked"/>
 
-    <!--android:layout_marginRight="10dp"-->
-    <!--android:layout_marginTop="10dp"-->
-
     <Button
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@mipmap/back"
         android:id="@+id/Back2Btn"
         android:visibility="gone"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:onClick="onBack2BtnClicked"/>
+
 </RelativeLayout>

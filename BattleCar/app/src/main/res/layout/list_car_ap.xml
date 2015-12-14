@@ -3,29 +3,29 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal"
     android:padding="15dip"
-    android:background="#0099cc">
+    android:background="#700099cc"
+    >
+    <!--android:cacheColorHint="#00000000"-->
 
     <ImageView
         android:id="@+id/carImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/car_2"
-        android:layout_weight="4"
+        android:layout_weight="1"
         />
-    <!--android:layout_weight="1"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:layout_centerVertical="true"-->
 
     <TextView
         android:id="@+id/carApName"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/carImg"
         android:layout_centerVertical="true"
         android:textSize="20dip"
-        android:layout_weight="6"
+        android:layout_weight="1"
+        android:typeface="sans"
         />
-    <!---->
+
     <TextView
         android:id="@+id/apCapa"
         android:layout_width="wrap_content"
@@ -33,10 +33,5 @@
         android:layout_toRightOf="@id/carApName"
         android:textSize="0dip"
         />
-
-    <!--android:textColor="#040404"-->
-    <!--android:typeface="sans"-->
-    <!--android:textSize="40dip"-->
-    <!--android:textStyle="bold"-->
 
 </RelativeLayout>

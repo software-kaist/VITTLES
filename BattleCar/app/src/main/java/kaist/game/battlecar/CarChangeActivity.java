@@ -94,11 +94,12 @@ public class CarChangeActivity extends Activity implements AdapterView.OnItemCli
             alert.setMessage("Capabilites Error!!");
             alert.show();
         }
+
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
     }
 
     public void searchVittles() {
-//        wifi.init();
-
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(wifiReceiver, filter);

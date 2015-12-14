@@ -2,26 +2,32 @@ package kaist.game.battlecar;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import kaist.game.battlecar.service.BluetoothService;
 import kaist.game.battlecar.util.Const;
 import kaist.game.battlecar.util.Utils;
+import kaist.game.battlecar.util.VittlesConnector;
 
 public class MainActivity extends Activity {
     private final static String TAG = MainActivity.class.getSimpleName();
     private BluetoothService btService = null;
     private boolean mIsOwner = false;
+    private SharedPreferences setting;
 
     private final Handler mHandler = new Handler() {
 
@@ -36,6 +42,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setting =  PreferenceManager.getDefaultSharedPreferences(this);
+
+        TextView text = (TextView)findViewById(R.id.textViewName);
+        text.setText("My VITTLES Name: " + setting.getString("my_vittles_ap", "NO_VITTLES"));
+        text.setTextSize(20);
+        text.setTextColor(Color.YELLOW);
     }
 
     @Override
