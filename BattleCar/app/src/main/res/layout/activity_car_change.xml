@@ -34,16 +34,18 @@
             android:nestedScrollingEnabled="true"
             android:onClick="onSearchBtnClicked" />
 
-        <Button
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/homeBtn"
-            android:background="@mipmap/back"
-            android:nestedScrollingEnabled="true"
-            android:onClick="onHomeBtnClicked"
-            android:layout_gravity="right" />
         <!--android:layout_toRightOf="@id/searchBtn"-->
     </LinearLayout>
+
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/homeBtn"
+        android:background="@mipmap/back"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:onClick="onHomeBtnClicked" />
 
     <LinearLayout
         android:orientation="horizontal"

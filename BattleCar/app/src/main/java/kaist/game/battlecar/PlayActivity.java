@@ -74,14 +74,14 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             switch(inputMessage.what){
                 case CarEventReceiver.SIMSOCK_DATA :
                     String msg = (String) inputMessage.obj;
-                    if(msg.contains("enemy")) {
-                        int enemyHp = Integer.parseInt(msg.substring("enemy".length()));
-                        mEnemyHpBar.setProgress((100 - enemyHp) / 100);
+                    if(msg.contains("enemyHP")) {
+                        int enemyHp = Integer.parseInt(msg.substring("enemyHP".length()));
+                        mEnemyHpBar.setProgress(enemyHp/100.0f);
                         vtEffector.playEffect(1, 300);
                         Log.d(TAG, "Enemy HP : " + msg);
                     } else {
                         int myHp = Integer.parseInt(msg);
-                        mMyHpBar.setProgress((100 - myHp) / 100);
+                        mMyHpBar.setProgress(myHp/100.0f);
                         sendHPSyncMessage("enemyHP" + msg);
                         vtEffector.playEffect(1, 300);
                         Log.d(TAG, "My HP : " + msg);
