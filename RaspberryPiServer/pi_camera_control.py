@@ -26,6 +26,7 @@ mCamera = 0
 mPlayer = 0
 globalThread = 0
 mVITTLESAppIP = 0
+mMyHealthPoint = 100
 
 #Motor 1 GPIO Pin
 IC1_A = 27
@@ -48,7 +49,7 @@ pwm = gpio.PWM(IC2_B,1000)
 pwm.ChangeDutyCycle(80)
 
 #IR Init & Sound Init
-sockid = lirc.init("myprogram", blocking=False)
+#sockid = lirc.init("myprogram", blocking=False)
 
 #cmd = "raspivid -n -t 0 -h 200 -w 320 -fps 20 -hf -vf -b 2000000 -o - | gst-launch-1.0 -v fdsrc ! h264parse ! rtph264pay pt=96 config-interval=1 ! gdppay ! tcpserversink host=192.168.0.12 port=5000"
 #youtube live streaming
@@ -105,7 +106,8 @@ cmd1 = "raspivid -t 0 -h 200 -w 355 -fps 20 -hf -vf -b 2000000 -o - | gst-launch
 
 @app.route('/camonoff/<client_ip>')
 def cam_onoff(client_ip):
-    global subproc, flag, mVITTLESAppIP
+    global subproc, flag, mVITTLESAppIP, mMyHealthPoint
+    mMyHealthPoint = 100
     #fwd = request.environ.get('HTTP_X_FORWARDED_FOR', None)
     #if fwd is None:
     #    clientIP = request.remote_addr
@@ -124,6 +126,8 @@ def cam_onoff(client_ip):
         os.killpg(subproc.pid, signal.SIGKILL)
         flag = 0
     elif flag == 0:
+        #IR Init & Sound Init
+        lirc.init("Vittles", blocking=False)
         proc = subprocess.Popen(cmd1%client_ip, shell=True, preexec_fn=os.setsid)
         subproc = proc
         flag = 1
@@ -172,19 +176,43 @@ class irThread (threading.Thread):
             time.sleep(0.2)
         print "Exiting" + self.name
 
-@app.route("/irThreadEnable", methods=['GET', 'POST'])
+@app.route("/irThreadEnable")
 def irThreadEnable() :
     global globalThread
     print "enabled"
     globalThread= irThread(1, "irThread", 100)
     globalThread.start()
 
-@app.route("/irThreadDisable", methods=['GET', 'POST'])
+@app.route("/irThreadDisable")
 def irThreadDisable() :
     global globalThread
     if globalThread :
         globalThread.signal = False
         print "disabled"
+
+# check commands in /etc/lirc/lirc.conf ...KEY_1,KEY2 ...
+@app.route('/irSend/<command>')
+def irSend(command):
+    print ("irsend "+ command)
+    #pygame.mixer.init()
+    #pygame.mixer.music.load("shoot.wav")
+    #pygame.mixer.music.play()
+    os.system("irsend SEND_ONCE LG "+command)
+    #while pygame.mixer.music.get_busy() == True:
+    #    continue
+
+@app.route('/irRead')
+def irRead():
+    global mMyHealthPoint
+    hit = lirc.nextcode()
+    if not hit :
+        print ("not hit")
+    else :
+        mMyHealthPoint = mMyHealthPoint - 10
+        if mMyHealthPoint < 0:
+            mMyHealthPoint = 0;
+        notifyBattleCarHP(mMyHealthPoint)
+        print ("hit: %s , HP: %d" % (hit , mMyHealthPoint))
 
 #neutral    0
 #movement forward|reverse (1|2)
@@ -248,16 +276,6 @@ def stopLR():
     #LOG('info','GPIO Front Wheel Zero')
     gpio.output(IC1_A, gpio.LOW)
     gpio.output(IC1_B, gpio.LOW)
-
-# check commands in /etc/lirc/lirc.conf ...KEY_1,KEY2 ...
-def irSend(command):
-    print ("irsend "+ command)
-    pygame.mixer.init()
-    pygame.mixer.music.load("shoot.wav")
-    pygame.mixer.music.play()
-    os.system("irsend SEND_ONCE LG "+command)
-    while pygame.mixer.music.get_busy() == True:
-        continue
 
 def notifyBattleCarHP(HP):
     global mVITTLESAppIP

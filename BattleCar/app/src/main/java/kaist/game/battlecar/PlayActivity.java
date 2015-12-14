@@ -68,6 +68,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     boolean bBattleMode = false;
     private String mWifiIpAddress;
     private BluetoothService btService = null;
+    private String mVittlesUrl;
 
     Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -77,7 +78,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                     String msg = (String) inputMessage.obj;
                     int myHp = Integer.parseInt(msg);
                     mMyHpBar.setProgress(myHp / 100.0f);
-                    sendHPSyncMessage("enemyHP" + msg); // send my HP data to enemy
+                    sendGameSyncMessage("enemyHP" + msg); // send my HP data to enemy
                     vtEffector.playEffect(1, 300);
                     Log.d(TAG, "My HP : " + msg);
                     break;
@@ -102,6 +103,10 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                             mEnemyHpBar.setProgress(enemyHp / 100.0f);
                             vtEffector.playEffect(1, 300);
                             Log.d(TAG, "Enemy HP : " + enemyHp);
+                        }
+                        else if (readMessage.contains("checkIR")) {
+                            new BackgroundTask(mVittlesUrl + "/irRead/" + "KEY_1").execute();
+                            Log.d(TAG, "checkIR");
                         }
                         //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
                     }
@@ -134,6 +139,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
         btService = BluetoothService.getInstance(this);
         btService.setHandler(mHandler);
+        mVittlesUrl = setting.getString("vittles_url", "");
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wake_lock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "GStreamer battle car");
@@ -156,8 +162,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 vtEffector.playEffect(3, 100);
 
                 // todo : Vittels 접속 루틴 여기로 옮겨서 처리!!
-                String vittlesUrl = setting.getString("vittles_url", "");
-                new BackgroundTask(vittlesUrl + "/camonoff/" + mWifiIpAddress).execute();
+                new BackgroundTask(mVittlesUrl + "/camonoff/" + mWifiIpAddress).execute();
 
             }
         });
@@ -194,8 +199,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 mMyHpBar.setVisibility(View.VISIBLE);
                 mEnemyHpBar.setVisibility(View.VISIBLE);
                 shoot.setVisibility(View.VISIBLE);
-                String vittlesUrl = setting.getString("vittles_url", "");
-                new BackgroundTask(vittlesUrl + "/irThreadEnable").execute();
+                //new BackgroundTask(mVittlesUrl + "/irThreadEnable").execute();
                 Log.i("Battle", "Start");
                 Log.i("ShootBtn", "Visible:");
             } else {
@@ -209,12 +213,12 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             @Override
             public void onClick(View v) {
                 vtEffector.playEffect(2, 100);
-                String vittlesUrl = setting.getString("vittles_url", "");
-                new BackgroundTask(vittlesUrl + "/irSend/" + "KEY_1").execute();
+                new BackgroundTask(mVittlesUrl + "/irSend/" + "KEY_1").execute();
                 Log.i("Shoot", "빵야~");
                 // test
                 //mMyHpBar.setProgress(0.6f);
                 //mEnemyHpBar.setProgress(0.2f);
+                sendGameSyncMessage("checkIR");
             }
         });
 
@@ -246,7 +250,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         //new BackgroundTask(setting.getString("vittles_url", "") + "/camonoff/" + mWifiIpAddress).execute();
     }
 
-    private void sendHPSyncMessage(String message) {
+    private void sendGameSyncMessage(String message) {
         // Check that we're actually connected before trying anything
         if (btService.getState() != BluetoothService.STATE_CONNECTED) {
             Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
@@ -409,12 +413,11 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
                 Log.i("Drive", movement + " " + steering + " " + weapon);
 
-                String vittlesUrl = setting.getString("vittles_url", "");
-//                directionTextView.setText("VITTLES URL: " + vittlesUrl);
+//                directionTextView.setText("VITTLES URL: " + mVittlesUrl);
 
                 StringBuilder commandCode = new StringBuilder();
                 commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
-                new BackgroundTask(vittlesUrl + "/inputBattleCar/" + commandCode.toString()).execute();
+                new BackgroundTask(mVittlesUrl + "/inputBattleCar/" + commandCode.toString()).execute();
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
@@ -423,8 +426,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     protected void onDestroy() {
         nativeFinalize();
         if (bBattleMode) {
-            String vittlesUrl = setting.getString("vittles_url", "");
-            new BackgroundTask(vittlesUrl + "/irThreadDisable").execute();
+            //new BackgroundTask(mVittlesUrl + "/irThreadDisable").execute();
         }
         if (wake_lock.isHeld())
             wake_lock.release();
