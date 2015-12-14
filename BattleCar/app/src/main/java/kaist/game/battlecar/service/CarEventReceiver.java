@@ -19,9 +19,9 @@ public class CarEventReceiver extends AsyncTask<Void, String, Void> {
 	private ServerSocket serverSocket;
 	private BufferedReader buffRecv;
 
-	public static final int SIMSOCK_CONNECTED = 1;
-	public static final int SIMSOCK_DATA = 2;
-	public static final int SIMSOCK_DISCONNECTED = 3;
+	public static final int SIMSOCK_CONNECTED = 0x11;
+	public static final int SIMSOCK_DATA = 0x12;
+	public static final int SIMSOCK_DISCONNECTED = 0x13;
 
 	public CarEventReceiver(Context context, Handler handler){
 		mContext = context;
