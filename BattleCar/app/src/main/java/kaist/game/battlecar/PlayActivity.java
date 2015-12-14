@@ -67,29 +67,46 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
     boolean bBattleMode = false;
     private String mWifiIpAddress;
+    private BluetoothService btService = null;
 
     Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message inputMessage) {
-            switch(inputMessage.what){
-                case CarEventReceiver.SIMSOCK_DATA :
+            switch(inputMessage.what) {
+                case CarEventReceiver.SIMSOCK_DATA: // Receive my HP data
                     String msg = (String) inputMessage.obj;
-                    if(msg.contains("enemyHP")) {
-                        int enemyHp = Integer.parseInt(msg.substring("enemyHP".length()));
-                        mEnemyHpBar.setProgress(enemyHp/100.0f);
-                        vtEffector.playEffect(1, 300);
-                        Log.d(TAG, "Enemy HP : " + msg);
-                    } else {
-                        int myHp = Integer.parseInt(msg);
-                        mMyHpBar.setProgress(myHp/100.0f);
-                        sendHPSyncMessage("enemyHP" + msg);
-                        vtEffector.playEffect(1, 300);
-                        Log.d(TAG, "My HP : " + msg);
-                    }
+                    int myHp = Integer.parseInt(msg);
+                    mMyHpBar.setProgress(myHp / 100.0f);
+                    sendHPSyncMessage("enemyHP" + msg); // send my HP data to enemy
+                    vtEffector.playEffect(1, 300);
+                    Log.d(TAG, "My HP : " + msg);
                     break;
 
-                case CarEventReceiver.SIMSOCK_CONNECTED :
-                case CarEventReceiver.SIMSOCK_DISCONNECTED :
+                case CarEventReceiver.SIMSOCK_CONNECTED:
+                case CarEventReceiver.SIMSOCK_DISCONNECTED:
+                    break;
+                // BT Message
+                case BluetoothService.MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) inputMessage.obj;
+                    String writeMessage = new String(writeBuf);
+                    if (writeMessage.length() > 0) {
+                        //Toast.makeText(getApplicationContext(), writeMessage, Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case BluetoothService.MESSAGE_READ: // read enemy HP data
+                    byte[] readBuf = (byte[]) inputMessage.obj;
+                    String readMessage = new String(readBuf, 0, inputMessage.arg1);
+                    if (readMessage.length() > 0) {
+                        if (readMessage.contains("enemyHP")) {
+                            int enemyHp = Integer.parseInt(readMessage.substring("enemyHP".length()));
+                            mEnemyHpBar.setProgress(enemyHp / 100.0f);
+                            vtEffector.playEffect(1, 300);
+                            Log.d(TAG, "Enemy HP : " + enemyHp);
+                        }
+                        //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                default:
                     break;
             }
         }
@@ -114,6 +131,9 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         Utils.setCleanView(this, true);
 
         setContentView(R.layout.activity_play);
+
+        btService = BluetoothService.getInstance(this);
+        btService.setHandler(mHandler);
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wake_lock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "GStreamer battle car");
@@ -228,7 +248,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 
     private void sendHPSyncMessage(String message) {
         // Check that we're actually connected before trying anything
-        BluetoothService btService = BluetoothService.getInstance(this);
         if (btService.getState() != BluetoothService.STATE_CONNECTED) {
             Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
