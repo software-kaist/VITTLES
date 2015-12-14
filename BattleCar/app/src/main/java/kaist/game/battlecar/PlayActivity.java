@@ -297,45 +297,45 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 int steering = 0;
                 int weapon = 0;
 
-                angleTextView.setText(" " + String.valueOf(angle) + "°");
-                powerTextView.setText(" " + String.valueOf(power) + "%");
+//                angleTextView.setText(" " + String.valueOf(angle) + "°");
+//                powerTextView.setText(" " + String.valueOf(power) + "%");
 
                 switch (direction) {
                     case JoystickView.FRONT:
                         movement = 1;
-                        directionTextView.setText("front");
+//                        directionTextView.setText("front");
                         break;
                     case JoystickView.FRONT_RIGHT:
                         movement = 1;
-                        directionTextView.setText("front_right");
+//                        directionTextView.setText("front_right");
                         break;
                     case JoystickView.RIGHT:
                         movement = 0;
-                        directionTextView.setText("right");
+//                        directionTextView.setText("right");
                         break;
                     case JoystickView.RIGHT_BOTTOM:
                         movement = 2;
-                        directionTextView.setText("right_bottom");
+//                        directionTextView.setText("right_bottom");
                         break;
                     case JoystickView.BOTTOM:
                         movement = 2;
-                        directionTextView.setText("bottom");
+//                        directionTextView.setText("bottom");
                         break;
                     case JoystickView.BOTTOM_LEFT:
                         movement = 2;
-                        directionTextView.setText("bottom_left");
+//                        directionTextView.setText("bottom_left");
                         break;
                     case JoystickView.LEFT:
                         movement = 0;
-                        directionTextView.setText("left");
+//                        directionTextView.setText("left");
                         break;
                     case JoystickView.LEFT_FRONT:
                         movement = 1;
-                        directionTextView.setText("left_front");
+//                        directionTextView.setText("left_front");
                         break;
                     default:
                         movement = 0;
-                        directionTextView.setText("center");
+//                        directionTextView.setText("center");
                 }
                 if (angle < -23 && angle > -157) {
                     steering = 1;
@@ -370,7 +370,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 Log.i("Drive", movement + " " + steering + " " +  weapon);
 
                 String vittlesUrl = setting.getString("vittles_url", "");
-                directionTextView.setText("VITTLES URL: " + vittlesUrl);
+//                directionTextView.setText("VITTLES URL: " + vittlesUrl);
 
                 StringBuilder commandCode = new StringBuilder();
                 commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
