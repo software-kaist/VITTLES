@@ -9,10 +9,10 @@
         android:id="@+id/carImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:src="@mipmap/car_2"
+        android:layout_weight="4"
         />
-
+    <!--android:layout_weight="1"-->
     <!--android:layout_alignParentLeft="true"-->
     <!--android:layout_centerVertical="true"-->
 
@@ -20,17 +20,18 @@
         android:id="@+id/carApName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_toRightOf="@id/carImg"
         android:layout_centerVertical="true"
         android:textSize="20dip"
+        android:layout_weight="6"
         />
-
+    <!---->
     <TextView
         android:id="@+id/apCapa"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_toRightOf="@id/carApName"
+        android:textSize="0dip"
         />
 
     <!--android:textColor="#040404"-->

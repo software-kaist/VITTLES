@@ -12,33 +12,52 @@
 
     <!-- android:background="@android:color/transparent" -->
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/carListView"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:id="@+id/searchBtn"
-        android:background="@mipmap/search"
-        android:nestedScrollingEnabled="true"
-        android:onClick="onSearchBtnClicked" />
-
     <!--android:layout_marginRight="50dp"-->
     <!--android:layout_marginTop="0dp"-->
     <!--android:layout_alignParentTop="true"-->
     <!--android:layout_alignParentEnd="true"-->
 
-    <Button
-        android:layout_width="50dp"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:id="@+id/homeBtn"
-        android:background="@mipmap/home"
-        android:nestedScrollingEnabled="true"
-        android:onClick="onHomeBtnClicked"
-        android:layout_toRightOf="@id/searchBtn"/>
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout1">
+
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/searchBtn"
+            android:background="@mipmap/search"
+            android:nestedScrollingEnabled="true"
+            android:onClick="onSearchBtnClicked" />
+
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/homeBtn"
+            android:background="@mipmap/back"
+            android:nestedScrollingEnabled="true"
+            android:onClick="onHomeBtnClicked"
+            android:layout_gravity="right" />
+        <!--android:layout_toRightOf="@id/searchBtn"-->
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_below="@id/linearLayout1">
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/carListView"
+            android:layout_alignParentStart="true" />
+    </LinearLayout>
 
     <!--android:layout_marginRight="0dp"-->
     <!--android:layout_marginTop="0dp"-->

@@ -36,7 +36,7 @@ public class CarChangeActivity extends Activity implements AdapterView.OnItemCli
         setContentView(R.layout.activity_car_change);
 
         setting =  PreferenceManager.getDefaultSharedPreferences(this);
-        wifi = new VittlesConnector(this, setting.getString("vittles_ap_prefix", ""));
+        wifi = new VittlesConnector(this, setting.getString("vittles_ap_prefix", "VITTLES"));
 
         searchVittles();
     }

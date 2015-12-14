@@ -192,7 +192,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         nativeInit();
 
         // todo : Vittles 자동 접속을 여기서 하면 최초 한번만 하게됨! Click 시로 변경 요망!
-		VittlesConnector wifi = new VittlesConnector(this, setting.getString("vittles_ap_prefix", ""));
+		VittlesConnector wifi = new VittlesConnector(this, setting.getString("vittles_ap_prefix", "VITTLES"));
         // todo: Perference에 암호 방식과 암호도 저장해야 함!!
         wifi.Connecting(setting.getString("my_vittles_ap", ""), "WPA", "intintint");
 
