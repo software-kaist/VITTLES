@@ -28,12 +28,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import kaist.game.battlecar.service.BluetoothService;
 import kaist.game.battlecar.service.CarEventReceiver;
 import kaist.game.battlecar.util.Const;
 import kaist.game.battlecar.util.Utils;
 import kaist.game.battlecar.util.VittlesConnector;
 import kaist.game.battlecar.util.VittlesEffector;
 import kaist.game.battlecar.view.GStreamerSurfaceView;
+import kaist.game.battlecar.view.HealthPointBarView;
 import kaist.game.battlecar.view.JoystickView;
 
 public class PlayActivity extends Activity implements SurfaceHolder.Callback {
@@ -55,15 +57,14 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private TextView powerTextView;
     private TextView directionTextView;
     private JoystickView joystick;
+    private HealthPointBarView mMyHpBar;
+    private HealthPointBarView mEnemyHpBar;
     private SharedPreferences setting;
     private VittlesEffector vtEffector;
     private int preMovement = -1;
     private int preSteering = -1;
     private int preWeapon = -1;
 
-    //jw
-    TextView tv;
-    int hp=100;
     boolean bBattleMode = false;
     private String mWifiIpAddress;
 
@@ -73,9 +74,18 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             switch(inputMessage.what){
                 case CarEventReceiver.SIMSOCK_DATA :
                     String msg = (String) inputMessage.obj;
-                    hp = Integer.parseInt(msg);
-                    vtEffector.playEffect(1, 300);
-                    Log.d(TAG, "My HP : "+msg);
+                    if(msg.contains("enemy")) {
+                        int enemyHp = Integer.parseInt(msg.substring("enemy".length()));
+                        mEnemyHpBar.setProgress((100 - enemyHp) / 100);
+                        vtEffector.playEffect(1, 300);
+                        Log.d(TAG, "Enemy HP : " + msg);
+                    } else {
+                        int myHp = Integer.parseInt(msg);
+                        mMyHpBar.setProgress((100 - myHp) / 100);
+                        sendHPSyncMessage("enemyHP" + msg);
+                        vtEffector.playEffect(1, 300);
+                        Log.d(TAG, "My HP : " + msg);
+                    }
                     break;
 
                 case CarEventReceiver.SIMSOCK_CONNECTED :
@@ -141,30 +151,36 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             }
         });
 
-        //jw
-        tv= (TextView)findViewById(R.id.tv);
+        mMyHpBar = (HealthPointBarView) findViewById(R.id.myHpProgress);
+        mMyHpBar.setProgressColor(getResources().getColor(R.color.hp_red));
+        mMyHpBar.setProgressBackgroundColor(getResources().getColor(R.color.hp_white));
+        mMyHpBar.useRoundedRectangleShape(30.0f);
+        mMyHpBar.setShowingPercentage(true);
+        mMyHpBar.setMaximumPercentage(1.0f);
+        mMyHpBar.setTextSize(15);
+
+        mEnemyHpBar = (HealthPointBarView) findViewById(R.id.enemyHpProgress);
+        mEnemyHpBar.setProgressColor(getResources().getColor(R.color.blue_500));
+        mEnemyHpBar.setProgressBackgroundColor(getResources().getColor(R.color.blue_200));
+        mEnemyHpBar.useRoundedRectangleShape(50.0f);
+        mEnemyHpBar.setShowingPercentage(true);
+        mEnemyHpBar.setMaximumPercentage(1.0f);
+        mEnemyHpBar.setTextSize(10);
+
         Button shoot = (Button) this.findViewById(R.id.button_Shoot);
         if (getIntent()!=null && getIntent().hasExtra(Const.EXTRA_BATTLE_MODE)) {
             bBattleMode = getIntent().getBooleanExtra(Const.EXTRA_BATTLE_MODE, false);
             if (bBattleMode) {
-                this.findViewById(R.id.hp1).setVisibility(View.VISIBLE);
-                this.findViewById(R.id.hp2).setVisibility(View.VISIBLE);
-                this.findViewById(R.id.hp3).setVisibility(View.VISIBLE);
-                this.findViewById(R.id.hp4).setVisibility(View.VISIBLE);
-                this.findViewById(R.id.hp5).setVisibility(View.VISIBLE);
-                this.findViewById(R.id.tv).setVisibility(View.VISIBLE);
+                mMyHpBar.setVisibility(View.VISIBLE);
+                mEnemyHpBar.setVisibility(View.VISIBLE);
                 shoot.setVisibility(View.VISIBLE);
                 String vittlesUrl = setting.getString("vittles_url", "");
                 new BackgroundTask(vittlesUrl + "/irThreadEnable").execute();
                 Log.i("Battle", "Start");
                 Log.i("ShootBtn", "Visible:");
             } else {
-                this.findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
-                this.findViewById(R.id.hp2).setVisibility(View.INVISIBLE);
-                this.findViewById(R.id.hp3).setVisibility(View.INVISIBLE);
-                this.findViewById(R.id.hp4).setVisibility(View.INVISIBLE);
-                this.findViewById(R.id.hp5).setVisibility(View.INVISIBLE);
-                this.findViewById(R.id.tv).setVisibility(View.INVISIBLE);
+                mMyHpBar.setVisibility(View.GONE);
+                mEnemyHpBar.setVisibility(View.GONE);
                 shoot.setVisibility(View.INVISIBLE);
                 Log.i("ShootBtn", "Invisible:");
             }
@@ -174,13 +190,14 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
             public void onClick(View v) {
                 vtEffector.playEffect(2, 100);
                 String vittlesUrl = setting.getString("vittles_url", "");
-                //hp = hp-10;
                 new BackgroundTask(vittlesUrl + "/irSend/" + "KEY_1").execute();
                 Log.i("Shoot", "빵야~");
+                // test
+                //mMyHpBar.setProgress(0.6f);
+                //mEnemyHpBar.setProgress(0.2f);
             }
         });
 
-        //jw
         SurfaceView sv = (SurfaceView) this.findViewById(R.id.surface_video);
         SurfaceHolder sh = sv.getHolder();
         sh.addCallback(this);
@@ -209,6 +226,22 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         //new BackgroundTask(setting.getString("vittles_url", "") + "/camonoff/" + mWifiIpAddress).execute();
     }
 
+    private void sendHPSyncMessage(String message) {
+        // Check that we're actually connected before trying anything
+        BluetoothService btService = BluetoothService.getInstance(this);
+        if (btService.getState() != BluetoothService.STATE_CONNECTED) {
+            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check that there's actually something to send
+        if (message.length() > 0) {
+            // Get the message bytes and tell the BluetoothChatService to write
+            byte[] send = message.getBytes();
+            btService.write(send);
+        }
+    }
+
     @Override
     protected void onResume() {
         Utils.setCleanView(this, false);
@@ -232,18 +265,6 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         }
 
         protected void onPostExecute(Integer a) {
-            //jw
-            if(60<hp&& hp<=80)
-                findViewById(R.id.hp1).setVisibility(View.INVISIBLE);
-            else if(40<hp&&hp<=60)
-                findViewById(R.id.hp2).setVisibility(View.INVISIBLE);
-            else if(20<hp&&hp<=40)
-                findViewById(R.id.hp3).setVisibility(View.INVISIBLE);
-            else if(0<hp&&hp<=20)
-                findViewById(R.id.hp4).setVisibility(View.INVISIBLE);
-            else if(hp==0)
-                findViewById(R.id.hp5).setVisibility(View.INVISIBLE);
-            tv.setText("HP : "+hp);
         }
 
     }
@@ -367,7 +388,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 preSteering = steering;
                 preWeapon = weapon;
 
-                Log.i("Drive", movement + " " + steering + " " +  weapon);
+                Log.i("Drive", movement + " " + steering + " " + weapon);
 
                 String vittlesUrl = setting.getString("vittles_url", "");
 //                directionTextView.setText("VITTLES URL: " + vittlesUrl);

@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:layout_alignParentBottom="true"
+        android:id="@+id/joystick_layout"
         android:orientation="horizontal">
         <kaist.game.battlecar.view.JoystickView
             android:layout_width="250dp"
@@ -69,72 +70,15 @@
             android:text="" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="300dip"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dip"
-        android:gravity="center_horizontal"
-        android:visibility="visible"
-        android:orientation="horizontal"
-        android:background="@android:color/transparent"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:weightSum="1"
-        android:id="@+id/linearLayout3">
-
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/hp1"
-            android:src="@mipmap/heart"
-            android:scaleType="fitXY" />
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/hp2"
-            android:src="@mipmap/heart"
-            android:scaleType="fitXY" />
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/hp3"
-            android:src="@mipmap/heart"
-            android:scaleType="fitXY" />
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/hp4"
-            android:src="@mipmap/heart"
-            android:scaleType="fitXY" />
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/hp5"
-            android:src="@mipmap/heart"
-            android:scaleType="fitXY" />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:id="@+id/hp"
-            android:src="@mipmap/green"
-            android:scaleType="fitXY"
-            android:background="@mipmap/hp_energy"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:id="@+id/tv"
-            android:text="HP"/>
-    </LinearLayout>
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@mipmap/shoot"
         android:id="@+id/button_Shoot"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="44dp"
-        android:layout_marginBottom="39dp" />
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp" />
 
     <ImageButton
         android:id="@+id/button_play"
@@ -146,8 +90,25 @@
         android:background="@android:color/transparent"
         android:src="@mipmap/car_start_btn"
         android:text=""
-        android:layout_alignBottom="@+id/button_Shoot"
-        android:layout_alignLeft="@+id/linearLayout3"
-        android:layout_alignStart="@+id/linearLayout3" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true" />
+
+    <kaist.game.battlecar.view.HealthPointBarView
+        android:id="@+id/myHpProgress"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_width="@dimen/my_hp_progress_width"
+        android:layout_height="@dimen/my_hp_progress_height" />
+
+    <kaist.game.battlecar.view.HealthPointBarView
+        android:id="@+id/enemyHpProgress"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_width="@dimen/enemy_hp_progress_width"
+        android:layout_height="@dimen/enemy_hp_progress_height" />
 
 </RelativeLayout>
