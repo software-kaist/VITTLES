@@ -111,4 +111,12 @@
         android:layout_width="@dimen/enemy_hp_progress_width"
         android:layout_height="@dimen/enemy_hp_progress_height" />
 
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/imagViewScope"
+        android:layout_alignTop="@+id/joystick_layout"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/scope03"/>
+
 </RelativeLayout>
