@@ -16,6 +16,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -196,13 +198,14 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         mEnemyHpBar.setTextSize(10);
 
         Button shoot = (Button) this.findViewById(R.id.button_Shoot);
-//        View scope = (View) this.findViewById(R.id.imagViewScope); // todo: 모드에 따라 보이게 안보이게
+        View scope = (View) this.findViewById(R.id.imagViewScope);
         if (getIntent()!=null && getIntent().hasExtra(Const.EXTRA_BATTLE_MODE)) {
             bBattleMode = getIntent().getBooleanExtra(Const.EXTRA_BATTLE_MODE, false);
             if (bBattleMode) {
                 mMyHpBar.setVisibility(View.VISIBLE);
                 mEnemyHpBar.setVisibility(View.VISIBLE);
                 shoot.setVisibility(View.VISIBLE);
+                scope.setVisibility(View.VISIBLE);
                 //new BackgroundTask(mVittlesUrl + "/irThreadEnable").execute();
                 Log.i("Battle", "Start");
                 Log.i("ShootBtn", "Visible:");
@@ -210,20 +213,18 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 mMyHpBar.setVisibility(View.GONE);
                 mEnemyHpBar.setVisibility(View.GONE);
                 shoot.setVisibility(View.INVISIBLE);
+                scope.setVisibility(View.INVISIBLE);
                 Log.i("ShootBtn", "Invisible:");
             }
         }
         shoot.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                // todo: 총을 쏘면 이미지가 커졌다 작아졌다로 쏜것을 표현
-//                ImageView scope = (ImageView)v.findViewById(R.id.imagViewScope);
-//                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) scope.getLayoutParams();
-//                params.width = 150;
-//                params.height = 150;
-//                scope.setLayoutParams(params);
-
+                Animation shake = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shake);
+                ImageView s = (ImageView) findViewById(R.id.imagViewScope);
+                s.startAnimation(shake);
                 vtEffector.playEffect(2, 100);
+
                 new BackgroundTask(mVittlesUrl + "/irSend/" + "KEY_1").execute();
                 Log.i("Shoot", "빵야~");
                 // test
