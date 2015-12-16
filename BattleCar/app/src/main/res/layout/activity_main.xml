@@ -25,8 +25,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:id="@+id/searchBtn"
-            android:background="@mipmap/mycar03"
-            android:nestedScrollingEnabled="true"/>
+            android:background="@mipmap/mycar03" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -43,10 +42,12 @@
         android:layout_height="wrap_content"
         android:text="Change Bettle Car"
         android:id="@+id/ChangeCarBtn"
-        android:layout_marginEnd="30dp"
-        android:layout_marginTop="76dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onChangeCarBtnClicked"/>
 
     <Button
@@ -55,8 +56,9 @@
         android:text="Play Game"
         android:id="@+id/PlayGameBtn"
         android:layout_below="@+id/ChangeCarBtn"
-        android:layout_alignEnd="@+id/ChangeCarBtn"
-        android:nestedScrollingEnabled="true"
+        android:layout_alignRight="@+id/ChangeCarBtn"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onPlayGameBtnClicked" />
 
     <Button
@@ -65,7 +67,9 @@
         android:text="Item Store"
         android:id="@+id/ItemStoreBtn"
         android:layout_below="@+id/PlayGameBtn"
-        android:layout_alignEnd="@+id/PlayGameBtn"
+        android:layout_alignRight="@+id/PlayGameBtn"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onItemStoreBtnClicked" />
 
     <Button
@@ -74,7 +78,9 @@
         android:text="Settings"
         android:id="@+id/SettingBtn"
         android:layout_below="@+id/ItemStoreBtn"
-        android:layout_alignEnd="@+id/PlayGameBtn"
+        android:layout_alignRight="@+id/PlayGameBtn"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onSettingBtnClicked"/>
 
     <Button
@@ -83,7 +89,9 @@
         android:text="Exit"
         android:id="@+id/ExitBtn"
         android:layout_below="@+id/SettingBtn"
-        android:layout_alignEnd="@+id/SettingBtn"
+        android:layout_alignRight="@+id/SettingBtn"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onExitBtnClicked"/>
 
     <Button
@@ -93,7 +101,9 @@
         android:id="@+id/BattleModeBtn"
         android:visibility="gone"
         android:layout_below="@+id/ChangeCarBtn"
-        android:layout_alignEnd="@+id/SettingBtn"
+        android:layout_alignRight="@+id/SettingBtn"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onBattleModeBtnClicked"/>
 
     <Button
@@ -103,7 +113,9 @@
         android:id="@+id/RacingModeBtn"
         android:visibility="gone"
         android:layout_below="@+id/BattleModeBtn"
-        android:layout_alignEnd="@+id/SettingBtn"
+        android:layout_alignRight="@+id/SettingBtn"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onRacingModeBtnClicked"/>
 
     <Button
@@ -113,7 +125,9 @@
         android:id="@+id/CreateBtn"
         android:visibility="gone"
         android:layout_below="@+id/ChangeCarBtn"
-        android:layout_alignEnd="@+id/SettingBtn"
+        android:layout_alignRight="@+id/SettingBtn"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onCreateBtnClicked"/>
 
     <Button
@@ -123,7 +137,9 @@
         android:id="@+id/JoinBtn"
         android:visibility="gone"
         android:layout_below="@+id/CreateBtn"
-        android:layout_alignEnd="@+id/SettingBtn"
+        android:layout_alignRight="@+id/SettingBtn"
+        android:background="@drawable/menu_button"
+        style="@style/button_text"
         android:onClick="onJoinBtnClicked"/>
 
     <Button

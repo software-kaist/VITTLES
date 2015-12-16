@@ -18,6 +18,7 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="hp_yellow">#c8fff200</color>
-    <color name="hp_red">#c8ff0d00</color>
+    <color name="hp_red">#e6ff0d00</color>
     <color name="hp_white">#c8ffffff</color>
+    <color name="menu_bg">#96007dd1</color>
 </resources>

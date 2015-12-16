@@ -10,6 +10,9 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +28,16 @@ public class MainActivity extends Activity {
     private BluetoothService btService = null;
     private boolean mIsOwner = false;
     private SharedPreferences setting;
+
+    private View mChangeCarMenu;
+    private View mPlayMenu;
+    private View mItemStoreMenu;
+    private View mSettingMenu;
+    private View mExitMenu;
+    private View mBattleMenu;
+    private View mRacingMenu;
+    private View mCreateMenu;
+    private View mJoinMenu;
 
     private final Handler mHandler = new Handler() {
 
@@ -50,10 +63,26 @@ public class MainActivity extends Activity {
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+
+        mChangeCarMenu = findViewById(R.id.ChangeCarBtn);
+        mPlayMenu = findViewById(R.id.PlayGameBtn);
+        mItemStoreMenu = findViewById(R.id.ItemStoreBtn);
+        mSettingMenu = findViewById(R.id.SettingBtn);
+        mExitMenu = findViewById(R.id.ExitBtn);
+        mBattleMenu = findViewById(R.id.BattleModeBtn);
+        mRacingMenu = findViewById(R.id.RacingModeBtn);
+        mCreateMenu = findViewById(R.id.CreateBtn);
+        mJoinMenu = findViewById(R.id.JoinBtn);
     }
 
     @Override
     protected void onResume() {
+        startMenuAnimation(mChangeCarMenu, true);
+        startMenuAnimation(mPlayMenu, true);
+        startMenuAnimation(mItemStoreMenu, true);
+        startMenuAnimation(mSettingMenu, true);
+        startMenuAnimation(mExitMenu, true);
+
         Utils.setCleanView(this, false);
         super.onResume();
     }
@@ -64,16 +93,14 @@ public class MainActivity extends Activity {
     }
 
     public void onPlayGameBtnClicked(View v) {
-        //Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
-        //startActivity(intent);
+        startMenuAnimation(mChangeCarMenu, false);
+        startMenuAnimation(mPlayMenu, false);
+        startMenuAnimation(mItemStoreMenu, false);
+        startMenuAnimation(mSettingMenu, false);
+        startMenuAnimation(mExitMenu, false);
+        startMenuAnimation(mBattleMenu, true);
+        startMenuAnimation(mRacingMenu, true);
 
-        findViewById(R.id.ChangeCarBtn).setVisibility(View.INVISIBLE);
-        findViewById(R.id.PlayGameBtn).setVisibility(View.INVISIBLE);
-        findViewById(R.id.ItemStoreBtn).setVisibility(View.INVISIBLE);
-        findViewById(R.id.SettingBtn).setVisibility(View.INVISIBLE);
-        findViewById(R.id.ExitBtn).setVisibility(View.INVISIBLE);
-        findViewById(R.id.BattleModeBtn).setVisibility(View.VISIBLE);
-        findViewById(R.id.RacingModeBtn).setVisibility(View.VISIBLE);
         findViewById(R.id.Back1Btn).setVisibility(View.VISIBLE);
     }
 
@@ -94,13 +121,13 @@ public class MainActivity extends Activity {
     }
 
     public void onBattleModeBtnClicked(View v) {
+        startMenuAnimation(mBattleMenu, false);
+        startMenuAnimation(mRacingMenu, false);
+        startMenuAnimation(mCreateMenu, true);
+        startMenuAnimation(mJoinMenu, true);
 
-        findViewById(R.id.BattleModeBtn).setVisibility(View.INVISIBLE);
-        findViewById(R.id.RacingModeBtn).setVisibility(View.INVISIBLE);
         findViewById(R.id.Back1Btn).setVisibility(View.INVISIBLE);
         findViewById(R.id.Back2Btn).setVisibility(View.VISIBLE);
-        findViewById(R.id.CreateBtn).setVisibility(View.VISIBLE);
-        findViewById(R.id.JoinBtn).setVisibility(View.VISIBLE);
     }
 
     public void onRacingModeBtnClicked(View v) {
@@ -118,21 +145,23 @@ public class MainActivity extends Activity {
     }
 
     public void onBack1BtnClicked(View v) {
-        findViewById(R.id.ChangeCarBtn).setVisibility(View.VISIBLE);
-        findViewById(R.id.PlayGameBtn).setVisibility(View.VISIBLE);
-        findViewById(R.id.ItemStoreBtn).setVisibility(View.VISIBLE);
-        findViewById(R.id.SettingBtn).setVisibility(View.VISIBLE);
-        findViewById(R.id.ExitBtn).setVisibility(View.VISIBLE);
-        findViewById(R.id.BattleModeBtn).setVisibility(View.INVISIBLE);
-        findViewById(R.id.RacingModeBtn).setVisibility(View.INVISIBLE);
+        startMenuAnimation(mChangeCarMenu, true);
+        startMenuAnimation(mPlayMenu, true);
+        startMenuAnimation(mItemStoreMenu, true);
+        startMenuAnimation(mSettingMenu, true);
+        startMenuAnimation(mExitMenu, true);
+        startMenuAnimation(mBattleMenu, false);
+        startMenuAnimation(mRacingMenu, false);
+
         findViewById(R.id.Back1Btn).setVisibility(View.INVISIBLE);
     }
     public void onBack2BtnClicked(View v) {
-        findViewById(R.id.BattleModeBtn).setVisibility(View.VISIBLE);
-        findViewById(R.id.RacingModeBtn).setVisibility(View.VISIBLE);
+        startMenuAnimation(mBattleMenu, true);
+        startMenuAnimation(mRacingMenu, true);
+        startMenuAnimation(mCreateMenu, false);
+        startMenuAnimation(mJoinMenu, false);
+
         findViewById(R.id.Back1Btn).setVisibility(View.VISIBLE);
-        findViewById(R.id.CreateBtn).setVisibility(View.INVISIBLE);
-        findViewById(R.id.JoinBtn).setVisibility(View.INVISIBLE);
         findViewById(R.id.Back2Btn).setVisibility(View.INVISIBLE);
     }
 
@@ -173,5 +202,66 @@ public class MainActivity extends Activity {
                 }
                 break;
         }
+    }
+
+    private void startMenuAnimation(View view, boolean isShow) {
+        if(isShow) {
+            view.startAnimation(inFromRightAnimation(view));
+        } else {
+            view.startAnimation(outToRightAnimation(view));
+        }
+    }
+
+    private Animation inFromRightAnimation(final View view) {
+        Animation inFromRight = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, +1.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f);
+        inFromRight.setDuration(600);
+        inFromRight.setInterpolator(new AccelerateInterpolator());
+        inFromRight.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+        return inFromRight;
+    }
+
+    private Animation outToRightAnimation(final View view) {
+        Animation outToRight = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, +1.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f);
+        outToRight.setDuration(600);
+        outToRight.setInterpolator(new AccelerateInterpolator());
+        outToRight.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(View.INVISIBLE);
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        return outToRight;
     }
 }
