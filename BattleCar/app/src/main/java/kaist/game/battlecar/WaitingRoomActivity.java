@@ -14,6 +14,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import kaist.game.battlecar.service.BluetoothService;
 import kaist.game.battlecar.util.Const;
 import kaist.game.battlecar.util.Utils;
@@ -97,6 +100,11 @@ public class WaitingRoomActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_waiting_room);
+
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         btService = BluetoothService.getInstance(this);
         btService.setHandler(mHandler);
         // Get local Bluetooth adapter

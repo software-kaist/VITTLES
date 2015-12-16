@@ -4,24 +4,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import kaist.game.battlecar.service.BluetoothService;
 import kaist.game.battlecar.util.Const;
 import kaist.game.battlecar.util.Utils;
-import kaist.game.battlecar.util.VittlesConnector;
 
 public class MainActivity extends Activity {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -49,6 +46,10 @@ public class MainActivity extends Activity {
         text.setText("My VITTLES Name: " + setting.getString("my_vittles_ap", "NO_VITTLES"));
         text.setTextSize(20);
         text.setTextColor(Color.YELLOW);
+
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     @Override
