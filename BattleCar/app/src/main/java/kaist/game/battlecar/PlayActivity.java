@@ -21,8 +21,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -467,7 +465,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         Log.i ("GStreamer", "GStreamer initialized:");
 
         // Restore previous playing state
-        setMediaUri ();
+        //setMediaUri ();
         nativeSetPosition (0);
         //if (is_playing_desired) {
             nativePlay();

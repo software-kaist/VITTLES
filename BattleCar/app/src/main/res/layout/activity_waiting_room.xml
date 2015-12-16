@@ -66,16 +66,6 @@
     <Button
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/XBtn"
-        android:background="@mipmap/x"
-        android:visibility="gone"
-        android:nestedScrollingEnabled="true"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentTop="true" />
-    <Button
-        android:layout_width="50dp"
-        android:layout_height="50dp"
         android:background="@mipmap/back"
         android:id="@+id/button_back"
         android:layout_alignParentTop="true"
@@ -91,7 +81,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:id="@+id/button_start"
-        android:background="@drawable/start_play"
+        android:background="@mipmap/start_play"
         android:visibility="gone"/>
 
     <com.google.android.gms.ads.AdView android:id="@+id/adView"

@@ -15,3 +15,11 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** v(...);
+}
+
+-keep class * implements java.io.Serializable { *; }
+-keep class kaist.game.battlecar.PlayActivity { *; }

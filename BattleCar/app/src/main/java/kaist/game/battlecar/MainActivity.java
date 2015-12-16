@@ -73,16 +73,15 @@ public class MainActivity extends Activity {
         mRacingMenu = findViewById(R.id.RacingModeBtn);
         mCreateMenu = findViewById(R.id.CreateBtn);
         mJoinMenu = findViewById(R.id.JoinBtn);
-    }
-
-    @Override
-    protected void onResume() {
         startMenuAnimation(mChangeCarMenu, true);
         startMenuAnimation(mPlayMenu, true);
         startMenuAnimation(mItemStoreMenu, true);
         startMenuAnimation(mSettingMenu, true);
         startMenuAnimation(mExitMenu, true);
+    }
 
+    @Override
+    protected void onResume() {
         Utils.setCleanView(this, false);
         super.onResume();
     }
