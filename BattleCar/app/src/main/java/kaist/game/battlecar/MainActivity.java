@@ -22,6 +22,7 @@ import com.google.android.gms.ads.AdView;
 import kaist.game.battlecar.service.BluetoothService;
 import kaist.game.battlecar.util.Const;
 import kaist.game.battlecar.util.Utils;
+import kaist.game.battlecar.util.WifiApManager;
 
 public class MainActivity extends Activity {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -101,9 +102,13 @@ public class MainActivity extends Activity {
         startMenuAnimation(mRacingMenu, true);
 
         findViewById(R.id.Back1Btn).setVisibility(View.VISIBLE);
+        boolean isWifiAP = WifiApManager.setWifiApEnabled(this, true);
+        Log.w(TAG, "wifi AP mode :" + isWifiAP);
     }
 
     public void onItemStoreBtnClicked(View v) {
+        boolean isWifiAP = WifiApManager.setWifiApEnabled(this, false);
+        Log.w(TAG, "wifi AP mode :" + isWifiAP);
         Intent intent = new Intent(getApplicationContext(), StoreActivity.class);
         startActivity(intent);
     }
