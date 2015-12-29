@@ -36,7 +36,9 @@ public class StoreActivity extends Activity {
     }
 
     public void onBack3BtnClicked(View v) {
-        finish();
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+
     }
     public void onBuy1BtnClicked(View v) {
         Toast.makeText(getApplicationContext(), "M60 Buy", Toast.LENGTH_SHORT).show();

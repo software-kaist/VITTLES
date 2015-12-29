@@ -118,6 +118,7 @@ public class CarChangeActivity extends Activity implements AdapterView.OnItemCli
     }
 
     public void onHomeBtnClicked(View v) {
-        finish();
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
     }
 }
