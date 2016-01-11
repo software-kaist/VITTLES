@@ -140,28 +140,17 @@ public class StoreActivity extends Activity {
     }
 
     public void getInAppItem() {
-
-        SkuDetails ret = bp.getPurchaseListingDetails("v_coins_01");
-
-        showToast("ret: " + ret);
-
         ArrayList<String> arrayListOfProductIds = new ArrayList<String> ();
         arrayListOfProductIds.add("v_coins_01");
         arrayListOfProductIds.add("v_coins_02");
         List<SkuDetails> retList = bp.getPurchaseListingDetails(arrayListOfProductIds);
 
-        showToast("ret: " + retList);
-
-        // add hsv item
-        setLayoutItems(R.id.ll_v_coins);
-        setLayoutItems(R.id.ll_v_coins);
-        setLayoutItems(R.id.ll_v_coins);
-        setLayoutItems(R.id.ll_v_coins);
-        setLayoutItems(R.id.ll_v_coins);
-        setLayoutItems(R.id.ll_v_coins);
+        for(SkuDetails tmp : retList) {
+            setLayoutItems(R.id.ll_v_coins, tmp);
+        }
     }
 
-    public void setLayoutItems(int layoutId) {
+    public void setLayoutItems(int layoutId, SkuDetails item) {
         LinearLayout.LayoutParams lpMW;
         lpMW = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
@@ -186,7 +175,7 @@ public class StoreActivity extends Activity {
 
         TextView tv = new TextView(this);
         tv.setLayoutParams(lpMW);
-        tv.setText("VC 1000\n");
+        tv.setText(item.description + "\n(" + item.priceText + ")\n");
         tv.setGravity(Gravity.CENTER);
         tv.setTextSize(15);
         ll.addView(tv);
@@ -202,7 +191,7 @@ public class StoreActivity extends Activity {
         ll.addView(ib);
     }
 
-     private void showToast(String message) {
+    private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }
