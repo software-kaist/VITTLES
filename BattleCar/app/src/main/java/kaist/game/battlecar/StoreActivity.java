@@ -140,17 +140,28 @@ public class StoreActivity extends Activity {
     }
 
     public void getInAppItem() {
+
+        SkuDetails ret = bp.getPurchaseListingDetails("v_coins_01");
+
+        showToast("ret: " + ret);
+
         ArrayList<String> arrayListOfProductIds = new ArrayList<String> ();
         arrayListOfProductIds.add("v_coins_01");
         arrayListOfProductIds.add("v_coins_02");
         List<SkuDetails> retList = bp.getPurchaseListingDetails(arrayListOfProductIds);
 
-        for(SkuDetails tmp : retList) {
-            setLayoutItems(R.id.ll_v_coins, tmp);
-        }
+        showToast("ret: " + retList);
+
+        // add hsv item
+        setLayoutItems(R.id.ll_v_coins);
+        setLayoutItems(R.id.ll_v_coins);
+        setLayoutItems(R.id.ll_v_coins);
+        setLayoutItems(R.id.ll_v_coins);
+        setLayoutItems(R.id.ll_v_coins);
+        setLayoutItems(R.id.ll_v_coins);
     }
 
-    public void setLayoutItems(int layoutId, SkuDetails item) {
+    public void setLayoutItems(int layoutId) {
         LinearLayout.LayoutParams lpMW;
         lpMW = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
@@ -175,7 +186,7 @@ public class StoreActivity extends Activity {
 
         TextView tv = new TextView(this);
         tv.setLayoutParams(lpMW);
-        tv.setText(item.description + "\n(" + item.priceText + ")\n");
+        tv.setText("VC 1000\n");
         tv.setGravity(Gravity.CENTER);
         tv.setTextSize(15);
         ll.addView(tv);
