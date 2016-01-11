@@ -66,6 +66,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private VittlesEffector vtEffector;
     private int preMovement = -1;
     private int preSteering = -1;
+    private int preGear = -1;
     private int preWeapon = -1;
 
     boolean bBattleMode = false;
@@ -165,6 +166,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 vtEffector.playEffect(3, 100);
 
                 // todo : Vittels 접속 루틴 여기로 옮겨서 처리!!
+                //new BackgroundTask(mVittlesUrl + "/camonoff/" + mWifiIpAddress).execute();
                 new BackgroundTask(mVittlesUrl + "/camonoff/" + mWifiIpAddress).execute();
 
             }
@@ -349,6 +351,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 final String delimiter = "$";
                 int movement = 0;
                 int steering = 0;
+                int gear = 0;
                 int weapon = 0;
 
 //                angleTextView.setText(" " + String.valueOf(angle) + "°");
@@ -403,6 +406,17 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 } else if (angle > 67 && angle < 113) {
                     steering = 0;
                 }
+                if (power == 0){
+                    gear = 0;
+                } else if( power > 0 && power <= 25){
+                    gear = 1;
+                } else if ( power >25 && power <= 50){
+                    gear = 2;
+                } else if ( power >50 && power <= 75){
+                    gear = 3;
+                } else if ( power >75 && power <= 100){
+                    gear = 4;
+                }
                 /*
                 neutral    0
                 movement forward|reverse (1|2)
@@ -413,12 +427,13 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 // todo : 주행 효과
 //                vtEffector.playEffect(4, 0);
 
-                if ((preMovement == movement) && (preSteering == steering) && (preWeapon == weapon)) {
+                if ((preMovement == movement) && (preSteering == steering) && (preGear == gear) && (preWeapon == weapon)) {
                     return;
                 }
 
                 preMovement = movement;
                 preSteering = steering;
+                preGear = gear;
                 preWeapon = weapon;
 
                 Log.i("Drive", movement + " " + steering + " " + weapon);
@@ -426,7 +441,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
 //                directionTextView.setText("VITTLES URL: " + mVittlesUrl);
 
                 StringBuilder commandCode = new StringBuilder();
-                commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
+                commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(gear).append(delimiter).append(weapon);
+                //commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
                 new BackgroundTask(mVittlesUrl + "/inputBattleCar/" + commandCode.toString()).execute();
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);

@@ -33,7 +33,7 @@ IC1_A = 27
 IC1_B = 22
  
 #Motor 2 GPIO Pin
-IC2_A = 17
+IC2_A = 10
 IC2_B = 18
  
 gpio.setmode(gpio.BCM)
@@ -47,9 +47,14 @@ gpio.setup(IC2_B, gpio.OUT)
 
 pwm = gpio.PWM(IC2_B,1000)
 pwm.ChangeDutyCycle(80)
+#jw
+pwmback = gpio.PWM(IC2_A,1000)
+pwmback.ChangeDutyCycle(80)
+
+mGear = 20
 
 #IR Init & Sound Init
-#sockid = lirc.init("myprogram", blocking=False)
+sockid = lirc.init("myprogram", blocking=False)
 
 #cmd = "raspivid -n -t 0 -h 200 -w 320 -fps 20 -hf -vf -b 2000000 -o - | gst-launch-1.0 -v fdsrc ! h264parse ! rtph264pay pt=96 config-interval=1 ! gdppay ! tcpserversink host=192.168.0.12 port=5000"
 #youtube live streaming
@@ -127,7 +132,7 @@ def cam_onoff(client_ip):
         flag = 0
     elif flag == 0:
         #IR Init & Sound Init
-        lirc.init("Vittles", blocking=False)
+        #lirc.init("Vittles", blocking=False)
         proc = subprocess.Popen(cmd1%client_ip, shell=True, preexec_fn=os.setsid)
         subproc = proc
         flag = 1
@@ -194,15 +199,11 @@ def irThreadDisable() :
 @app.route('/irSend/<command>')
 def irSend(command):
     print ("irsend "+ command)
-    #pygame.mixer.init()
-    #pygame.mixer.music.load("shoot.wav")
-    #pygame.mixer.music.play()
     os.system("irsend SEND_ONCE LG "+command)
-    #while pygame.mixer.music.get_busy() == True:
-    #    continue
+    return "test"
 
-@app.route('/irRead')
-def irRead():
+@app.route('/irRead/<command>')
+def irRead(command):
     global mMyHealthPoint
     hit = lirc.nextcode()
     if not hit :
@@ -213,20 +214,21 @@ def irRead():
             mMyHealthPoint = 0;
         notifyBattleCarHP(mMyHealthPoint)
         print ("hit: %s , HP: %d" % (hit , mMyHealthPoint))
-
+    return "test"
 #neutral    0
 #movement forward|reverse (1|2)
 #steering left|right (1|2)
 #movement $ steering $ angle(-180~180) $ power(0~100%) $ weapon
 @app.route('/inputBattleCar/<command>')
 def inputBattleCar(command):
+    global mGear
     data = command.split('$')
     movement = int(data[0])
     steering = int(data[1])
-    angle = int(data[2])
-    power = int(data[3])
-    weapon = data[4]
-
+    #angle = int(data[2])
+    gear = int(data[3])
+    mGear = 20 * gear;
+    print("inputBattleCar] mGear = " + str(mGear))
     if movement == 1:
         forward()
     elif movement == 2:
@@ -240,20 +242,23 @@ def inputBattleCar(command):
         turnRight()
     else:
         stopLR()
-#    print ("%s ----" % weapon)
-    if weapon :
-        irSend(weapon)
 
     return command
 
 def forward():
     #LOG('info','GPIO Forward')
+    print("forward] mGear : " + str(mGear))
     gpio.output(IC2_A, gpio.LOW)
     #gpio.output(IC2_B, gpio.HIGH)
-    pwm.start(80)
+    pwmback.stop()
+    pwm.start(mGear)
+    
 def backward():
+    print("backward] mGear : " +str(mGear))
     #LOG('info','GPIO Backward')
-    gpio.output(IC2_A, gpio.HIGH)
+    pwm.stop() #VITTLES_2 O / VITTELS X
+    pwmback.start(mGear)
+    #gpio.output(IC2_A, gpio.HIGH)
     gpio.output(IC2_B, gpio.LOW)
 
 def turnLeft():
@@ -269,6 +274,7 @@ def turnRight():
 def stopFB():
     #LOG('info','GPIO Stop Back Wheel')
     pwm.stop()
+    pwmback.stop()
     gpio.output(IC2_A, gpio.LOW)
     gpio.output(IC2_B, gpio.LOW)
 
