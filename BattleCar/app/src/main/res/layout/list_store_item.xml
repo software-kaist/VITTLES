@@ -1,12 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginLeft="1dp"
+    android:layout_marginRight="1dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:orientation="vertical"
+    android:background="@drawable/border">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/v_coin_1"
+        android:id="@+id/itemCoinImg" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="V-Coins"
-        android:id="@+id/textView"
-        android:layout_gravity="center_vertical" />
+        android:id="@+id/tvDescription"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:id="@+id/tvProductId" />
+
+    <ImageButton
+        android:id="@+id/ibBuy"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/buy"
+        android:layout_gravity="center" />
 </LinearLayout>

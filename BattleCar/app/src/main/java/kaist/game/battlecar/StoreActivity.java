@@ -1,42 +1,51 @@
 package kaist.game.battlecar;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentSender;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.SkuDetails;
-import com.anjlab.android.iab.v3.TransactionDetails;
+import com.android.vending.billing.IInAppBillingService;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import kaist.game.battlecar.util.Utils;
 
 public class StoreActivity extends Activity {
-    // SAMPLE APP CONSTANTS
-    private static final String ACTIVITY_NUMBER = "activity_num";
-    private static final String LOG_TAG = "iabv3";
+    private static final String LOG_TAG = StoreActivity.class.getSimpleName();;
 
-    // PRODUCT & SUBSCRIPTION IDS
-    private static final String PRODUCT_ID = "com.vittles.android.v2";
-    private static final String SUBSCRIPTION_ID = "com.anjlab.test.iab.subs1";
-    private static final String LICENSE_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyZRV65VN99UECFgXR7ghf71Rx44nAdnR8kMwVVa+eQGQJrvaN5Lku0rvArClTcEgofYVQtqmf/yanJf2TZrFnDgWwUSvU9xOcG/eQ5jAczg67Y0fDZ+nhNLT2u/8i6uE1pwxdOLKl2QntTi+2KBX6LZoxpT4hsIdg8UZM6dfalY0WRfdaqRKT01vIzOEIBDs2YuCeFjvNUxcubH/MQgNmVxje38CzwmSDo9+LVeBD1AzZytvkEkh9FBBFw6KLLlXixwIwgrSAiHuS5DGcTZ+g8S74g3vSWc2dgPhO5oWl8AhUvCn2UvOgMtxBd/okNVDfmf2aV8ed5R8r1Y01k9xLQIDAQAB"; // PUT YOUR MERCHANT KEY HERE;
-    // put your Google merchant id here (as stated in public profile of your Payments Merchant Center)
-    // if filled library will provide protection against Freedom alike Play Market simulators
-    private static final String MERCHANT_ID="04775518919030000842";
+    private IInAppBillingService mService;
+    private ServiceConnection mServiceConn = new ServiceConnection() {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+        }
 
-    private BillingProcessor bp;
-    private boolean readyToPurchase = false;
+        @Override
+        public void onServiceConnected(ComponentName name,
+                                       IBinder service) {
+            mService = IInAppBillingService.Stub.asInterface(service);
+        }
+    };
 
     //    private TextView Vcoin;
     private int coin=1500;
@@ -104,33 +113,18 @@ public class StoreActivity extends Activity {
             }
         });
 
-        if(!BillingProcessor.isIabServiceAvailable(this)) {
-            showToast("In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16");
-        }
+        // In App Billing
+        Intent serviceIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
+        serviceIntent.setPackage("com.android.vending");
+        bindService(serviceIntent, mServiceConn, Context.BIND_AUTO_CREATE);
+    }
 
-        bp = new BillingProcessor(this, LICENSE_KEY, MERCHANT_ID, new BillingProcessor.IBillingHandler() {
-            @Override
-            public void onProductPurchased(String productId, TransactionDetails details) {
-                showToast("onProductPurchased: " + productId);
-            }
-            @Override
-            public void onBillingError(int errorCode, Throwable error) {
-                showToast("onBillingError: " + Integer.toString(errorCode));
-            }
-            @Override
-            public void onBillingInitialized() {
-                showToast("onBillingInitialized");
-                readyToPurchase = true;
-            }
-            @Override
-            public void onPurchaseHistoryRestored() {
-                showToast("onPurchaseHistoryRestored");
-                for(String sku : bp.listOwnedProducts())
-                    Log.d(LOG_TAG, "Owned Managed Product: " + sku);
-                for(String sku : bp.listOwnedSubscriptions())
-                    Log.d(LOG_TAG, "Owned Subscription: " + sku);
-            }
-        });
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mService != null) {
+            unbindService(mServiceConn);
+        }
     }
 
     @Override
@@ -140,58 +134,143 @@ public class StoreActivity extends Activity {
     }
 
     public void getInAppItem() {
-        ArrayList<String> arrayListOfProductIds = new ArrayList<String> ();
-        arrayListOfProductIds.add("v_coins_01");
-        arrayListOfProductIds.add("v_coins_02");
-        List<SkuDetails> retList = bp.getPurchaseListingDetails(arrayListOfProductIds);
+        ArrayList<String> skuList = new ArrayList<String> ();
+        skuList.add("v_coins_01");
+        skuList.add("v_coins_02");
+        skuList.add("v_coins_03");
+        skuList.add("v_coins_04");
+        skuList.add("v_coins_05");
+        Bundle querySkus = new Bundle();
+        querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
 
-        for(SkuDetails tmp : retList) {
-            setLayoutItems(R.id.ll_v_coins, tmp);
+        Bundle skuDetails;
+        try {
+            skuDetails = mService.getSkuDetails(3, getPackageName(), "inapp", querySkus);
+            Log.i(LOG_TAG, "getSkuDetails() - success return Bundle");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            Log.w(LOG_TAG, "getSkuDetails() - fail!");
+            return;
+        }
+
+        int response = skuDetails.getInt("RESPONSE_CODE");
+        Log.i(LOG_TAG, "getSkuDetails() - \"RESPONSE_CODE\" return " + String.valueOf(response));
+
+        if (response == 0) {
+            ArrayList<String> responseList = skuDetails.getStringArrayList("DETAILS_LIST");
+
+            for (String thisResponse : responseList) {
+                setLayoutItems(R.id.ll_v_coins, thisResponse);
+            }
         }
     }
 
-    public void setLayoutItems(int layoutId, SkuDetails item) {
-        LinearLayout.LayoutParams lpMW;
-        lpMW = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+    public void setLayoutItems(int layoutId, String itemDtails) {
+        String sku, title, price;
+        try {
+            JSONObject object = new JSONObject(itemDtails);
+            sku = object.getString("productId");
+            title = object.getString("title");
+            price = object.getString("price");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
 
         LinearLayout sv = (LinearLayout)findViewById(layoutId);
         sv.setPadding(10, 10, 10, 10);
 
-        LinearLayout ll = new LinearLayout(this);
-        ll.setLayoutParams(lpMW);
-        ll.setPadding(20, 20, 20, 20);
-        LinearLayout.LayoutParams layparam = (LinearLayout.LayoutParams) ll.getLayoutParams();
-        layparam.rightMargin = 1;
-        layparam.leftMargin = 1;
-        ll.setLayoutParams(layparam);
-        ll.setBackgroundResource(R.drawable.border);
-        ll.setOrientation(LinearLayout.VERTICAL);
-        sv.addView(ll);
+        LayoutInflater inflater =  (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        View col = inflater.inflate(R.layout.list_store_item, null);
 
-        ImageView iv = new ImageView(this);
-        iv.setLayoutParams(lpMW);
-        iv.setBackgroundResource(R.mipmap.v_coin_1);
-        ll.addView(iv);
-
-        TextView tv = new TextView(this);
-        tv.setLayoutParams(lpMW);
-        tv.setText(item.description + "\n(" + item.priceText + ")\n");
+        TextView tv = (TextView)col.findViewById(R.id.tvDescription);
+        tv.setText(title + "\n(" + price + ")\n");
         tv.setGravity(Gravity.CENTER);
-        tv.setTextSize(15);
-        ll.addView(tv);
 
-        ImageButton ib = new ImageButton(this);
-        ib.setBackgroundResource(R.mipmap.buy);
+        tv = (TextView)col.findViewById(R.id.tvProductId);
+        tv.setText(sku);
+
+        ImageButton ib = (ImageButton)col.findViewById(R.id.ibBuy);;
         ib.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showToast("Clicked!");
+                TextView tv = (TextView) findViewById(R.id.tvProductId);
+
+                purchase(tv.getText().toString());
+//                bp.purchase((Activity)getApplicationContext(), tv.getText().toString());
+                showToast("Clicked!" + v.getId() + " " + tv.getText().toString());
             }
         });
-        ll.addView(ib);
+
+        sv.addView(col);
     }
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void purchase(String productId){
+        if (mService == null) return;
+
+        Bundle ownedItems;
+        try {
+            ownedItems = mService.getPurchases(3, getPackageName(), "inapp", null);
+            Log.i(LOG_TAG, "getPurchases() - success return Bundle");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            Log.w(LOG_TAG, "getPurchases() - fail!");
+            return;
+        }
+
+        int response = ownedItems.getInt("RESPONSE_CODE");
+        Log.i(LOG_TAG, "getPurchases() - \"RESPONSE_CODE\" return " + String.valueOf(response));
+
+        if (response != 0) return;
+
+        ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+        ArrayList<String> purchaseDataList = ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
+        ArrayList<String> signatureList = ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
+        String continuationToken = ownedItems.getString("INAPP_CONTINUATION_TOKEN");
+
+//        Log.i(tag, "getPurchases() - \"INAPP_PURCHASE_ITEM_LIST\" return " + ownedSkus.toString());
+//        Log.i(tag, "getPurchases() - \"INAPP_PURCHASE_DATA_LIST\" return " + purchaseDataList.toString());
+//        Log.i(tag, "getPurchases() - \"INAPP_DATA_SIGNATURE\" return " + (signatureList != null ? signatureList.toString() : "null"));
+//        Log.i(tag, "getPurchases() - \"INAPP_CONTINUATION_TOKEN\" return " + (continuationToken != null ? continuationToken : "null"));
+
+        // TODO: management owned purchase
+
+        try {
+            Bundle buyIntentBundle = mService.getBuyIntent(3, getPackageName(), productId, "inapp", "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
+
+            PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
+
+            startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0));
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (IntentSender.SendIntentException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1001) {
+            int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
+            String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
+            String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
+
+            if (resultCode == RESULT_OK) {
+                try {
+                    JSONObject jo = new JSONObject(purchaseData);
+                    String sku = jo.getString("productId");
+//                    alert("You have bought the " + sku + ". Excellent choice, adventurer!");
+                }
+                catch (JSONException e) {
+//                    alert("Failed to parse purchase data.");
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
