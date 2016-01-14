@@ -33,6 +33,8 @@ import kaist.game.battlecar.util.Utils;
 public class StoreActivity extends Activity {
     private static final String LOG_TAG = StoreActivity.class.getSimpleName();;
 
+    public final static int DYNAMIC_IN_APP_BUY_BTN_ID = 0x8000;
+    public ArrayList<String> inAppList;
     private IInAppBillingService mService;
     private ServiceConnection mServiceConn = new ServiceConnection() {
         @Override
@@ -157,20 +159,21 @@ public class StoreActivity extends Activity {
         Log.i(LOG_TAG, "getSkuDetails() - \"RESPONSE_CODE\" return " + String.valueOf(response));
 
         if (response == 0) {
-            ArrayList<String> responseList = skuDetails.getStringArrayList("DETAILS_LIST");
-
-            for (String thisResponse : responseList) {
-                setLayoutItems(R.id.ll_v_coins, thisResponse);
+            inAppList = skuDetails.getStringArrayList("DETAILS_LIST");
+            int idx = 0;
+            for (String thisResponse : inAppList) {
+                setLayoutItems(R.id.ll_v_coins, thisResponse, idx);
+                idx++;
             }
         }
     }
 
-    public void setLayoutItems(int layoutId, String itemDtails) {
-        String sku, title, price;
+    public void setLayoutItems(int layoutId, String itemDtails, int idx) {
+        String sku, description, price;
         try {
             JSONObject object = new JSONObject(itemDtails);
             sku = object.getString("productId");
-            title = object.getString("title");
+            description = object.getString("description");
             price = object.getString("price");
         } catch (JSONException e) {
             e.printStackTrace();
@@ -184,21 +187,23 @@ public class StoreActivity extends Activity {
         View col = inflater.inflate(R.layout.list_store_item, null);
 
         TextView tv = (TextView)col.findViewById(R.id.tvDescription);
-        tv.setText(title + "\n(" + price + ")\n");
+        tv.setText(description + "\n(" + price + ")\n");
         tv.setGravity(Gravity.CENTER);
 
-        tv = (TextView)col.findViewById(R.id.tvProductId);
-        tv.setText(sku);
-
-        ImageButton ib = (ImageButton)col.findViewById(R.id.ibBuy);;
+        ImageButton ib = (ImageButton)col.findViewById(R.id.ibBuy);
+        ib.setId(R.id.ibBuy + DYNAMIC_IN_APP_BUY_BTN_ID + idx);
         ib.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TextView tv = (TextView) findViewById(R.id.tvProductId);
-
-                purchase(tv.getText().toString());
-//                bp.purchase((Activity)getApplicationContext(), tv.getText().toString());
-                showToast("Clicked!" + v.getId() + " " + tv.getText().toString());
+                int idx = v.getId() - (R.id.ibBuy + DYNAMIC_IN_APP_BUY_BTN_ID);
+                try {
+                    JSONObject object = new JSONObject(inAppList.get(idx));
+                    purchase(object.getString("productId"));
+//                    showToast("Clicked!" + v.getId() + " " + object.getString("productId"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
         });
 
@@ -232,6 +237,8 @@ public class StoreActivity extends Activity {
         ArrayList<String> signatureList = ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
         String continuationToken = ownedItems.getString("INAPP_CONTINUATION_TOKEN");
 
+        // 구한 내역으로 화면 구성을 다시!!
+        // 오류로 구매 완료가 안된 경우 처리 필요!!
 //        Log.i(tag, "getPurchases() - \"INAPP_PURCHASE_ITEM_LIST\" return " + ownedSkus.toString());
 //        Log.i(tag, "getPurchases() - \"INAPP_PURCHASE_DATA_LIST\" return " + purchaseDataList.toString());
 //        Log.i(tag, "getPurchases() - \"INAPP_DATA_SIGNATURE\" return " + (signatureList != null ? signatureList.toString() : "null"));
@@ -239,13 +246,11 @@ public class StoreActivity extends Activity {
 
         // TODO: management owned purchase
 
+//        "android.test.purchased"
         try {
             Bundle buyIntentBundle = mService.getBuyIntent(3, getPackageName(), productId, "inapp", "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
-
             PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
-
             startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0));
-
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (IntentSender.SendIntentException e) {
