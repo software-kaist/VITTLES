@@ -56,6 +56,28 @@ mGear = 20
 #IR Init & Sound Init
 sockid = lirc.init("myprogram", blocking=False)
 
+def controlInputListener(a):
+    server_socket = socket(AF_INET, SOCK_STREAM)
+    server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    server_socket.bind(('0.0.0.0', 24068))
+    server_socket.listen(0)
+    print '[check] controlInputListener start 24068 port'
+    try:
+        while True:
+            client, addr = server_socket.accept()
+            print '[check] Connected by: ', addr
+            data = client.recv(1024)
+            if not data:
+                break
+            #print('%s' % data) 
+            inputBattleCar(data.decode('utf-8'))
+    finally:
+        client.close()
+        server_socket.close()
+        print '[check] controlInputListener end'
+
+thread.start_new_thread(controlInputListener, ('controlInputListener',))
+
 #cmd = "raspivid -n -t 0 -h 200 -w 320 -fps 20 -hf -vf -b 2000000 -o - | gst-launch-1.0 -v fdsrc ! h264parse ! rtph264pay pt=96 config-interval=1 ! gdppay ! tcpserversink host=192.168.0.12 port=5000"
 #youtube live streaming
 #cmd = "raspivid -n -o - -t 0 -vf -hf -fps 30 -b 6000000 | ffmpeg -re -ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero -f h264 -i - -vcodec copy -acodec aac -ab 128k -g 50 -strict experimental -f flv rtmp://a.rtmp.youtube.com/live2/hochan97.yucp-bpu9-yzwj-2aec"
@@ -343,6 +365,8 @@ def rtmpStreamer(a):
         mPlayer.terminate()
         os.kill(mPlayer.pid, signal.SIGKILL);
         print '[check] rtmpStreamer end'
+
+
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0', port=8888, debug=True)

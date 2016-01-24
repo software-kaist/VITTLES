@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import kaist.game.battlecar.AsyncTasks.SendMessageClient;
 import kaist.game.battlecar.service.BluetoothService;
 import kaist.game.battlecar.service.CarEventReceiver;
 import kaist.game.battlecar.util.Const;
@@ -73,6 +74,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private String mWifiIpAddress;
     private BluetoothService btService = null;
     private String mVittlesUrl;
+    private Context mContext;
 
     Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -144,7 +146,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
         btService = BluetoothService.getInstance(this);
         btService.setHandler(mHandler);
         mVittlesUrl = setting.getString("vittles_url", "");
-
+        mContext = this;
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wake_lock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "GStreamer battle car");
         wake_lock.setReferenceCounted(false);
@@ -166,9 +168,7 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 vtEffector.playEffect(3, 100);
 
                 // todo : Vittels 접속 루틴 여기로 옮겨서 처리!!
-                //new BackgroundTask(mVittlesUrl + "/camonoff/" + mWifiIpAddress).execute();
                 new BackgroundTask(mVittlesUrl + "/camonoff/" + mWifiIpAddress).execute();
-
             }
         });
 
@@ -443,7 +443,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
                 StringBuilder commandCode = new StringBuilder();
                 commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(gear).append(delimiter).append(weapon);
                 //commandCode.append(movement).append(delimiter).append(steering).append(delimiter).append(angle).append(delimiter).append(power).append(delimiter).append(weapon);
-                new BackgroundTask(mVittlesUrl + "/inputBattleCar/" + commandCode.toString()).execute();
+                //new BackgroundTask(mVittlesUrl + "/inputBattleCar/" + commandCode.toString()).execute();
+                new SendMessageClient(mVittlesUrl).execute(commandCode.toString());
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
     }
