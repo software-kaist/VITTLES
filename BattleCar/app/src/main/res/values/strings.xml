@@ -52,6 +52,9 @@
     <string name="not_connected">Not connected</string>
     <string name="start_battle">start_battle</string>
 
+    <!-- My Vittles Setting -->
+    <string name="pref_header_my_vittles">My VITTLES Items</string>
+
     <!--  DeviceListActivity -->
     <string name="scanning">scanning for devices...</string>
     <string name="select_device">select a device to connect</string>

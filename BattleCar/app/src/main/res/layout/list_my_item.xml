@@ -16,27 +16,19 @@
         android:layout_height="wrap_content"
         android:id="@+id/itemImg"
         android:layout_gravity="center"
-        android:layout_weight="5"/>
+        android:layout_weight="6"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tvDescription"
+        android:id="@+id/tvItemName"
         android:layout_gravity="center"
-        android:layout_weight="3"/>
+        android:layout_weight="2"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:id="@+id/tvProductId"
-        android:layout_weight="0"/>
-
-    <ImageButton
-        android:id="@+id/ibBuy"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@mipmap/buy"
+        android:id="@+id/tvItemValue"
         android:layout_gravity="center"
         android:layout_weight="2"/>
 

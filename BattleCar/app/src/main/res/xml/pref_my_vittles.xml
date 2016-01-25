@@ -1,0 +1,41 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="shield"
+        android:title="Shield(Count)"
+        android:defaultValue="10"
+        android:selectable="false"/>
+
+    <EditTextPreference
+        android:key="magazine"
+        android:title="Magazine(Count)"
+        android:defaultValue="10"
+        android:selectable="false"
+        android:shouldDisableView="false"/>
+
+    <EditTextPreference
+        android:key="reload_system"
+        android:title="Reload System(SEC)"
+        android:defaultValue="10"
+        android:selectable="false"/>
+
+    <EditTextPreference
+        android:key="emp"
+        android:title="EMP(Count)"
+        android:defaultValue="0"
+        android:selectable="false"/>
+
+    <EditTextPreference
+        android:digits="true"
+        android:key="healing"
+        android:title="Healing(Count)"
+        android:defaultValue="0"
+        android:selectable="false"/>
+
+    <EditTextPreference
+        android:key="my_coins"
+        android:title="My VITTLES Coins(VC)"
+        android:defaultValue="0"
+        android:selectable="false"/>
+
+</PreferenceScreen>

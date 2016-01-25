@@ -12,4 +12,9 @@
         android:icon="@drawable/ic_notifications_black_24dp"
         android:title="@string/pref_header_network" />
 
+    <header
+        android:fragment="kaist.game.battlecar.SettingsActivity$MyVittlesPreferenceFragment"
+        android:icon="@drawable/ic_sync_black_24dp"
+        android:title="@string/pref_header_my_vittles" />
+
 </preference-headers>

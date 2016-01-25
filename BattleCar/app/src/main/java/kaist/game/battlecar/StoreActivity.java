@@ -7,15 +7,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -28,13 +33,21 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import kaist.game.battlecar.adapter.ItemInfo;
 import kaist.game.battlecar.util.Utils;
 
 public class StoreActivity extends Activity {
     private static final String LOG_TAG = StoreActivity.class.getSimpleName();;
 
-    public final static int DYNAMIC_IN_APP_BUY_BTN_ID = 0x8000;
-    public ArrayList<String> inAppList;
+    private final static int DYNAMIC_IN_APP_BUY_BTN_ID = 0x8000;
+    private final static int DYNAMIC_ITEM_BUY_BTN_ID = 0x8100;
+
+    private ArrayList<String> inAppList;
+    private ArrayList<ItemInfo> itemValueList = new ArrayList<ItemInfo> ();
+    private Context mContext;
+    private int myCoins = 0;
+    private SharedPreferences setting;
+
     private IInAppBillingService mService;
     private ServiceConnection mServiceConn = new ServiceConnection() {
         @Override
@@ -49,19 +62,15 @@ public class StoreActivity extends Activity {
         }
     };
 
-    //    private TextView Vcoin;
-    private int coin=1500;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_store);
 
-//        AdView mAdView = (AdView) findViewById(R.id.adView);
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        mAdView.loadAd(adRequest);
+        mContext = this;
+        setting =  PreferenceManager.getDefaultSharedPreferences(this);
 
-//        Vcoin= (TextView)findViewById(R.id.vcoin);
+        displayMyCoins();
 
         Button back = (Button)findViewById(R.id.button_back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -99,21 +108,26 @@ public class StoreActivity extends Activity {
 
         // show First Tab Content
         tabHost.setCurrentTab(0);
+        getMyItem();
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String tabId) {
-                showToast("Tab: " + tabId);
                 if (tabId.equals("MyItem")) {
-                    // Get My Item Information from APP Server
+                    getMyItem();
                 } else if (tabId.equals("Attack")) {
-                    //destroy mars
+                    getAttackItem();
                 } else if (tabId.equals("Defense")) {
-                    //destroy mars
+                    getDefenseItem();
                 } else if (tabId.equals("VCoins")) {
                     getInAppItem();
                 }
             }
         });
+
+        // todo: 아이템 서버 및 구글플레이에 접속하기 위해 인터넷에 연결 필요! 비틀즈와 연결 해제 후
+        // todo: 스토어화면 나갈 때 다시 비틀즈로 접속하게 수정 필요!
+        setAttackButton();
+        setDefenseButton();
 
         // In App Billing
         Intent serviceIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
@@ -135,7 +149,268 @@ public class StoreActivity extends Activity {
         super.onResume();
     }
 
+    public void displayMyCoins() {
+        //        myCoins = setting.getInt("my_coins", 0);
+        myCoins = Integer.parseInt(setting.getString("my_coins", "0"));
+        TextView text = (TextView)findViewById(R.id.textViewName);
+        text.setText("My VITTLES Coins: " + myCoins);
+        text.setTextSize(20);
+        text.setTextColor(Color.YELLOW);
+        text.setGravity(Gravity.CENTER);
+    }
+
+    public void getMyItem() {
+        LinearLayout sv = (LinearLayout)findViewById(R.id.ll_info);
+        sv.removeAllViewsInLayout();
+        insertMyItem(R.id.ll_info, R.mipmap.shield_01, "Shield", setting.getString("shield", "10"), "");
+        insertMyItem(R.id.ll_info, R.mipmap.magazine_01, "Magazine", setting.getString("magazine", "50"), "");
+        insertMyItem(R.id.ll_info, R.mipmap.reload_02, "Reload SEC", setting.getString("reload_system", "10"), "");
+        insertMyItem(R.id.ll_info, R.mipmap.emp_02, "EMP", setting.getString("emp", "0"), "");
+        insertMyItem(R.id.ll_info, R.mipmap.healing_03, "Healing", setting.getString("healing", "0"), "");
+    }
+
+    public void insertMyItem(int layoutId, int imgId, String title, String val, String measure) {
+        LinearLayout sv = (LinearLayout)findViewById(layoutId);
+        sv.setPadding(10, 10, 10, 10);
+
+        LayoutInflater inflater =  (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        View col = inflater.inflate(R.layout.list_my_item, null);
+
+        ImageView iv = (ImageView)col.findViewById(R.id.itemImg);
+        iv.setBackgroundResource(imgId);
+        // todo: 화면크기에 대응하도록 수정 필요!
+        ViewGroup.LayoutParams param= iv.getLayoutParams();
+        param.width = 150;
+        param.height = 150;
+        iv.setLayoutParams(param);
+
+        TextView tv = (TextView)col.findViewById(R.id.tvItemName);
+        tv.setText(title);
+        tv.setGravity(Gravity.CENTER);
+
+        tv = (TextView)col.findViewById(R.id.tvItemValue);
+        tv.setText(val);
+        tv.setGravity(Gravity.CENTER);
+
+        sv.addView(col);
+    }
+
+    public void getAttackItem() {
+        // todo: 서버에서 Attack Items을 받아서 보여주게 수정
+        LinearLayout sv = (LinearLayout)findViewById(R.id.ll_attack);
+        sv.removeAllViewsInLayout();
+        itemValueList.clear();
+
+        insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 15, 1000, 0);
+        insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 20, 2000, 1);
+        insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 25, 3000, 2);
+        insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 30, 4000, 3);
+        insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 40, 5000, 4);
+    }
+
+    public void insertItemInfo(int layoutId, int imgId, String description, int itemVal, int itemPrice, int idx) {
+        itemValueList.add(new ItemInfo(description, itemVal, itemPrice));
+        LinearLayout sv = (LinearLayout)findViewById(layoutId);
+        sv.setPadding(10, 10, 10, 10);
+
+        LayoutInflater inflater =  (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        View col = inflater.inflate(R.layout.list_store_item, null);
+
+        ImageView iv = (ImageView)col.findViewById(R.id.itemImg);
+        iv.setBackgroundResource(imgId);
+        // todo: 화면크기에 대응하도록 수정 필요!
+        ViewGroup.LayoutParams param= iv.getLayoutParams();
+        param.width = 100;
+        param.height = 100;
+        iv.setLayoutParams(param);
+
+        TextView tv = (TextView)col.findViewById(R.id.tvDescription);
+        tv.setText(description + " " + itemVal + "\n(VC " + itemPrice + ")\n");
+        tv.setGravity(Gravity.CENTER);
+
+        ImageButton ib = (ImageButton)col.findViewById(R.id.ibBuy);
+        ib.setId(R.id.ibBuy + DYNAMIC_ITEM_BUY_BTN_ID + idx);
+        ib.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int idx = v.getId() - (R.id.ibBuy + DYNAMIC_ITEM_BUY_BTN_ID);
+                ItemInfo itemInfo = itemValueList.get(idx);
+                String name = itemInfo.getItemName();
+                int val = itemInfo.getItemValue();
+                int price = itemInfo.getItemPrice();
+
+//                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+//                builder.setTitle("종료 확인 대화 상자")
+//                        .setMessage("아이템(" + name + " " + val + " - VC" + price + ")을 구매하시겠습니까?")
+//                        .setCancelable(false)
+//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int whichButton) {
+//                                finish();
+//                            }
+//                        })
+//                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int whichButton) {
+//                                dialog.cancel();
+//                            }
+//                        });
+//                AlertDialog dialog = builder.create();
+//                dialog.show();
+
+                showToast("아이템(" + name + " " + val + " - VC" + price + ")을 구매하시겠습니까?");
+
+                if (myCoins < price) {
+                    showToast("VITTLES Coin이 부족합니다.");
+                    return;
+                }
+
+                myCoins -= itemInfo.getItemPrice();
+                SharedPreferences.Editor edit = setting.edit();
+
+                if (name.equals("Magazines")) {
+                    edit.putString("magazine", String.format("%d", val));
+//                    edit.putInt("magazine", val);
+                } else if (name.equals("Reload System")) {
+                    edit.putString("reload_system", String.format("%d", val));
+//                    edit.putInt("reload_system", val);
+                } else if (name.equals("EMP")) {
+                    int sVal = Integer.parseInt(setting.getString("emp", "0"));
+                    edit.putString("emp", String.format("%d", sVal + val));
+//                    int sVal = setting.getInt("emp", 0);
+//                    edit.putInt("emp", sVal + val);
+                } else if (name.equals("Shield")) {
+                    int sVal = Integer.parseInt(setting.getString("shield", "10"));
+                    edit.putString("shield", String.format("%d", sVal + val));
+//                    int sVal = setting.getInt("shield", 10);
+//                    edit.putInt("shield", sVal + val);
+                } else if (name.equals("Healing")) {
+                    int sVal = Integer.parseInt(setting.getString("healing", "0"));
+                    edit.putString("healing", String.format("%d", sVal + val));
+//                    int sVal = setting.getInt("healing", 0);
+//                    edit.putInt("healing", sVal + val);
+                } else {
+                    myCoins += itemInfo.getItemPrice();
+                }
+
+                edit.putString("my_coins", String.format("%d", myCoins));
+//                edit.putInt("my_coins", myCoins);
+                edit.commit();
+                displayMyCoins();
+            }
+        });
+
+        sv.addView(col);
+    }
+
+    public void setAttackButton() {
+        // ADD Magazien, Reload System, EMP Button
+        LinearLayout linear = (LinearLayout) findViewById(R.id.ll_attack_btn);
+
+        Button btnMagazine = new Button(this);
+        btnMagazine.setText("Magazine");
+        btnMagazine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout sv = (LinearLayout)findViewById(R.id.ll_attack);
+                sv.removeAllViewsInLayout();
+                itemValueList.clear();
+                insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 15, 1000, 0);
+                insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 20, 2000, 1);
+                insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 25, 3000, 2);
+                insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 30, 4000, 3);
+                insertItemInfo(R.id.ll_attack, R.mipmap.magazine_01, "Magazines", 40, 5000, 4);
+            }
+        });
+        linear.addView(btnMagazine);
+
+        Button btnReloadSystem = new Button(this);
+        btnReloadSystem.setText("Reload System");
+        btnReloadSystem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout sv = (LinearLayout)findViewById(R.id.ll_attack);
+                sv.removeAllViewsInLayout();
+                itemValueList.clear();
+                insertItemInfo(R.id.ll_attack, R.mipmap.reload_02, "Reload System", 7, 1000, 0);
+                insertItemInfo(R.id.ll_attack, R.mipmap.reload_02, "Reload System", 5, 2000, 1);
+                insertItemInfo(R.id.ll_attack, R.mipmap.reload_02, "Reload System", 3, 3000, 2);
+                insertItemInfo(R.id.ll_attack, R.mipmap.reload_02, "Reload System", 1, 4000, 3);
+            }
+        });
+        linear.addView(btnReloadSystem);
+
+        Button btnEmp = new Button(this);
+        btnEmp.setText("EMP");
+        btnEmp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout sv = (LinearLayout)findViewById(R.id.ll_attack);
+                sv.removeAllViewsInLayout();
+                itemValueList.clear();
+                insertItemInfo(R.id.ll_attack, R.mipmap.emp_02, "EMP", 5, 1000, 0);
+                insertItemInfo(R.id.ll_attack, R.mipmap.emp_02, "EMP", 10, 2000, 1);
+                insertItemInfo(R.id.ll_attack, R.mipmap.emp_02, "EMP", 15, 3000, 2);
+                insertItemInfo(R.id.ll_attack, R.mipmap.emp_02, "EMP", 20, 4000, 3);
+            }
+        });
+        linear.addView(btnEmp);
+    }
+
+    public void getDefenseItem() {
+        // todo: 서버에서 Defense Items을 받아서 보여주게 수정
+        LinearLayout sv = (LinearLayout)findViewById(R.id.ll_defense);
+        sv.removeAllViewsInLayout();
+        itemValueList.clear();
+        insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 1, 1000, 0);
+        insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 3, 2000, 1);
+        insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 5, 3000, 2);
+        insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 7, 4000, 3);
+        insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 10, 5000, 4);
+    }
+
+    public void setDefenseButton() {
+        // ADD Shield, Healing Button
+        LinearLayout linear = (LinearLayout) findViewById(R.id.ll_defense_btn);
+
+        Button btnShield = new Button(this);
+        btnShield.setText("Shield");
+        btnShield.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout sv = (LinearLayout)findViewById(R.id.ll_defense);
+                sv.removeAllViewsInLayout();
+                itemValueList.clear();
+                // todo: MAX 20
+                insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 1, 1000, 0);
+                insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 3, 2000, 1);
+                insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 5, 3000, 2);
+                insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 7, 4000, 3);
+                insertItemInfo(R.id.ll_defense, R.mipmap.shield_01, "Shield", 10, 5000, 4);
+            }
+        });
+        linear.addView(btnShield);
+
+        Button btnHealing = new Button(this);
+        btnHealing.setText("Healing");
+        btnHealing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout sv = (LinearLayout)findViewById(R.id.ll_defense);
+                sv.removeAllViewsInLayout();
+                itemValueList.clear();
+                insertItemInfo(R.id.ll_defense, R.mipmap.healing_03, "Healing", 1, 1000, 0);
+                insertItemInfo(R.id.ll_defense, R.mipmap.healing_03, "Healing", 3, 2000, 1);
+                insertItemInfo(R.id.ll_defense, R.mipmap.healing_03, "Healing", 5, 3000, 2);
+                insertItemInfo(R.id.ll_defense, R.mipmap.healing_03, "Healing", 7, 4000, 3);
+                insertItemInfo(R.id.ll_defense, R.mipmap.healing_03, "Healing", 10, 5000, 4);
+            }
+        });
+        linear.addView(btnHealing);
+    }
+
     public void getInAppItem() {
+        LinearLayout sv = (LinearLayout)findViewById(R.id.ll_v_coins);
+        sv.removeAllViewsInLayout();
+
         ArrayList<String> skuList = new ArrayList<String> ();
         skuList.add("v_coins_01");
         skuList.add("v_coins_02");
@@ -162,17 +437,16 @@ public class StoreActivity extends Activity {
             inAppList = skuDetails.getStringArrayList("DETAILS_LIST");
             int idx = 0;
             for (String thisResponse : inAppList) {
-                setLayoutItems(R.id.ll_v_coins, thisResponse, idx);
+                insertInAppItem(R.id.ll_v_coins, R.mipmap.v_coin_1, thisResponse, idx);
                 idx++;
             }
         }
     }
 
-    public void setLayoutItems(int layoutId, String itemDtails, int idx) {
-        String sku, description, price;
+    public void insertInAppItem(int layoutId, int imgId, String itemDtails, int idx) {
+        String description, price;
         try {
             JSONObject object = new JSONObject(itemDtails);
-            sku = object.getString("productId");
             description = object.getString("description");
             price = object.getString("price");
         } catch (JSONException e) {
@@ -185,6 +459,13 @@ public class StoreActivity extends Activity {
 
         LayoutInflater inflater =  (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
         View col = inflater.inflate(R.layout.list_store_item, null);
+
+        ImageView iv = (ImageView)col.findViewById(R.id.itemImg);
+        iv.setBackgroundResource(imgId);
+        ViewGroup.LayoutParams param= iv.getLayoutParams();
+        param.width = 150;
+        param.height = 150;
+        iv.setLayoutParams(param);
 
         TextView tv = (TextView)col.findViewById(R.id.tvDescription);
         tv.setText(description + "\n(" + price + ")\n");
@@ -199,7 +480,6 @@ public class StoreActivity extends Activity {
                 try {
                     JSONObject object = new JSONObject(inAppList.get(idx));
                     purchase(object.getString("productId"));
-//                    showToast("Clicked!" + v.getId() + " " + object.getString("productId"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                     return;

@@ -75,6 +75,8 @@ public class PlayActivity extends Activity implements SurfaceHolder.Callback {
     private BluetoothService btService = null;
     private String mVittlesUrl;
     private Context mContext;
+    // todo: 전역 변수로 관리
+//    private int myHp = 100;
 
     Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
