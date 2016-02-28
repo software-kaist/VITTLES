@@ -31,7 +31,11 @@ mMyHealthPoint = 100
 #Motor 1 GPIO Pin
 IC1_A = 27
 IC1_B = 22
- 
+
+#IR PATH
+hit_path = "/sys/bus/platform/drivers/lirc_rpi_vittles/hit"
+shoot_path = "/sys/bus/platform/drivers/lirc_rpi_vittles/shoot"
+
 #Motor 2 GPIO Pin
 IC2_A = 10
 IC2_B = 18
@@ -52,9 +56,6 @@ pwmback = gpio.PWM(IC2_A,1000)
 pwmback.ChangeDutyCycle(80)
 
 mGear = 20
-
-#IR Init & Sound Init
-sockid = lirc.init("myprogram", blocking=False)
 
 def controlInputListener(a):
     server_socket = socket(AF_INET, SOCK_STREAM)
@@ -220,15 +221,21 @@ def irThreadDisable() :
 # check commands in /etc/lirc/lirc.conf ...KEY_1,KEY2 ...
 @app.route('/irSend/<command>')
 def irSend(command):
-    print ("irsend "+ command)
-    os.system("irsend SEND_ONCE LG "+command)
+    global shoot_path
+# TODO : file open & close should be moved to init and deinit function for efficiency 
+    f=open(shoot_path, 'w')
+    f.write("shoot")
+    f.close()
+    print("shoot")
     return "test"
 
 @app.route('/irRead/<command>')
 def irRead(command):
     global mMyHealthPoint
-    hit = lirc.nextcode()
-    if not hit :
+    global hit_path 
+    f=open(hit_path,'r') 
+    hit = f.read()
+    if not int(hit) :
         print ("not hit")
     else :
         mMyHealthPoint = mMyHealthPoint - 10
@@ -236,7 +243,9 @@ def irRead(command):
             mMyHealthPoint = 0;
         notifyBattleCarHP(mMyHealthPoint)
         print ("hit: %s , HP: %d" % (hit , mMyHealthPoint))
+    f.close()
     return "test"
+
 #neutral    0
 #movement forward|reverse (1|2)
 #steering left|right (1|2)
@@ -365,8 +374,6 @@ def rtmpStreamer(a):
         mPlayer.terminate()
         os.kill(mPlayer.pid, signal.SIGKILL);
         print '[check] rtmpStreamer end'
-
-
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0', port=8888, debug=True)

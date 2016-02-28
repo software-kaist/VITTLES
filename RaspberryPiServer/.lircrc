@@ -1,0 +1,18 @@
+begin
+    prog = irexec
+    button = KEY_1
+    config = echo "you pressed 1"
+    repeat = 3
+end
+
+begin 
+    prog =myprogram
+    button =KEY_1
+    config =1
+end
+
+begin 
+    prog =myprogram
+    button =KEY_2
+    config =2
+end
